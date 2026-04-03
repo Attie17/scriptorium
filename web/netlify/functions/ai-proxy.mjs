@@ -1,3 +1,18 @@
+const VALID_PASSKEYS = [
+  'SCRP-2026-ALPHA-7K9M',
+  'SCRP-2026-BETA-3N8X',
+  'SCRP-2026-GAMMA-5J2P',
+  'SCRP-2026-DELTA-9W4R',
+  'SCRP-2026-THETA-1L6C'
+];
+
+const PROVIDER_KEYS = {
+  claude:     'ANTHROPIC_API_KEY',
+  chatgpt:    'OPENAI_API_KEY',
+  perplexity: 'PERPLEXITY_API_KEY',
+  grok:       'XAI_API_KEY'
+};
+
 export default async (req, context) => {
   if (req.method === 'OPTIONS') {
     return new Response('', {
@@ -11,10 +26,24 @@ export default async (req, context) => {
   }
 
   try {
-    const { provider, prompt, systemPrompt, apiKey } = await req.json();
+    const { provider, prompt, systemPrompt, passkey } = await req.json();
 
-    if (!provider || !prompt || !apiKey) {
-      return new Response(JSON.stringify({ error: 'Missing provider, prompt, or apiKey' }), { status: 400 });
+    if (!passkey || !VALID_PASSKEYS.includes(passkey.trim().toUpperCase())) {
+      return Response.json({ error: 'Invalid or missing passkey' }, { status: 403 });
+    }
+
+    if (!provider || !prompt) {
+      return new Response(JSON.stringify({ error: 'Missing provider or prompt' }), { status: 400 });
+    }
+
+    const envVar = PROVIDER_KEYS[provider];
+    if (!envVar) {
+      return new Response(JSON.stringify({ error: 'Unknown provider' }), { status: 400 });
+    }
+
+    const apiKey = process.env[envVar];
+    if (!apiKey) {
+      return Response.json({ error: `API key not configured for ${provider}` }, { status: 500 });
     }
 
     let url, headers, body;
@@ -58,8 +87,6 @@ export default async (req, context) => {
           { role: 'user', content: prompt }
         ]
       });
-    } else {
-      return new Response(JSON.stringify({ error: 'Unknown provider' }), { status: 400 });
     }
 
     const res = await fetch(url, { method: 'POST', headers, body });

@@ -276,37 +276,24 @@
       <button class="btn-primary" onclick="ob_validate_passkey()">Verify →</button>
     </div>
 
-    <!-- Step 1: API Keys -->
+    <!-- Step 1: Author name -->
     <div class="ob-step" id="ob-step-1">
-      <h2>Enter your API keys</h2>
-      <div class="sub">Stored locally in your browser. Never sent to our server.</div>
-      <div class="key-grid">
-        <div class="key-row"><div class="key-label">Anthropic (Claude)</div><input type="password" id="key-claude" placeholder="sk-ant-..."/></div>
-        <div class="key-row"><div class="key-label">OpenAI (ChatGPT)</div><input type="password" id="key-chatgpt" placeholder="sk-..."/></div>
-        <div class="key-row"><div class="key-label">Perplexity</div><input type="password" id="key-perplexity" placeholder="pplx-..."/></div>
-        <div class="key-row"><div class="key-label">xAI (Grok)</div><input type="password" id="key-grok" placeholder="xai-..."/></div>
-      </div>
-      <button class="btn-primary" onclick="ob_next(1)">Continue →</button>
-    </div>
-
-    <!-- Step 2: Author name -->
-    <div class="ob-step" id="ob-step-2">
       <h2>What is your name?</h2>
       <div class="sub">Your name appears on every published document.</div>
       <input type="text" id="ob-author" placeholder="Your full name"/>
-      <button class="btn-primary" onclick="ob_next(2)">Continue →</button>
+      <button class="btn-primary" onclick="ob_next(1)">Continue →</button>
     </div>
 
-    <!-- Step 3: First project name -->
-    <div class="ob-step" id="ob-step-3">
+    <!-- Step 2: First project name -->
+    <div class="ob-step" id="ob-step-2">
       <h2>Name your first project</h2>
       <div class="sub">You can create more projects later.</div>
       <input type="text" id="ob-project-name" placeholder="e.g. The Hour of Fury"/>
-      <button class="btn-primary" onclick="ob_next(3)">Continue →</button>
+      <button class="btn-primary" onclick="ob_next(2)">Continue →</button>
     </div>
 
-    <!-- Step 4: Genre -->
-    <div class="ob-step" id="ob-step-4">
+    <!-- Step 3: Genre -->
+    <div class="ob-step" id="ob-step-3">
       <h2>What kind of writing is this?</h2>
       <div class="sub">This shapes how every AI in the pipeline responds.</div>
       <div class="option-grid">
@@ -315,11 +302,11 @@
         <button class="option-btn" data-val="fiction" onclick="ob_select(this,'ob-genre')">📖 Fiction</button>
         <button class="option-btn" data-val="journalism" onclick="ob_select(this,'ob-genre')">🗞️ Journalism</button>
       </div>
-      <button class="btn-primary" onclick="ob_next(4)">Continue →</button>
+      <button class="btn-primary" onclick="ob_next(3)">Continue →</button>
     </div>
 
-    <!-- Step 5: Language -->
-    <div class="ob-step" id="ob-step-5">
+    <!-- Step 4: Language -->
+    <div class="ob-step" id="ob-step-4">
       <h2>Publishing language</h2>
       <div class="sub">All exports will be in your chosen language.</div>
       <div class="option-grid">
@@ -328,11 +315,11 @@
         <button class="option-btn" data-val="both" onclick="ob_select(this,'ob-lang')">Both (EN + AF)</button>
         <button class="option-btn" data-val="other" onclick="ob_select(this,'ob-lang')">Other</button>
       </div>
-      <button class="btn-primary" onclick="ob_next(5)">Continue →</button>
+      <button class="btn-primary" onclick="ob_next(4)">Continue →</button>
     </div>
 
-    <!-- Step 6: Structure -->
-    <div class="ob-step" id="ob-step-6">
+    <!-- Step 5: Structure -->
+    <div class="ob-step" id="ob-step-5">
       <h2>How is this work structured?</h2>
       <div class="sub">This determines how each chapter or piece is organised.</div>
       <div class="option-grid">
@@ -475,11 +462,8 @@
   <div class="modal">
     <button class="close-btn" onclick="close_modal('modal-settings')">×</button>
     <h2>Settings</h2>
-    <div class="key-label">Anthropic (Claude)</div><input type="password" id="s-key-claude"/>
-    <div class="key-label">OpenAI (ChatGPT)</div><input type="password" id="s-key-chatgpt"/>
-    <div class="key-label">Perplexity</div><input type="password" id="s-key-perplexity"/>
-    <div class="key-label">xAI (Grok)</div><input type="password" id="s-key-grok"/>
-    <button class="btn-primary" style="margin-top:16px;" onclick="save_settings()">Save Keys</button>
+    <div class="key-label">Author Name</div><input type="text" id="s-author"/>
+    <button class="btn-primary" style="margin-top:16px;" onclick="save_settings()">Save Settings</button>
   </div>
 </div>
 
@@ -605,7 +589,7 @@ async function aiCall(provider, prompt, systemPrompt) {
     const res = await fetch('/.netlify/functions/ai-proxy', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ provider, prompt, systemPrompt, apiKey: config.keys[provider] })
+      body: JSON.stringify({ provider, prompt, systemPrompt, passkey: config.passkey })
     });
     const data = await res.json();
     return data;
@@ -625,7 +609,7 @@ let activeChapter = null;
 // ── BOOT ──
 window.onload = () => {
   config = DB.loadConfig();
-  if (config && config.keys && config.author && config.passkey) {
+  if (config && config.author && config.passkey) {
     show_screen('screen-app');
     refresh_projects();
   } else {
@@ -646,7 +630,7 @@ function toggleSidebar() {
 }
 
 // ── ONBOARDING ──
-const OB_STEPS = 7;
+const OB_STEPS = 6;
 let ob_genre = '', ob_lang = '', ob_structure = '';
 
 const VALID_PASSKEYS = [
@@ -690,16 +674,10 @@ function ob_next(step) {
 }
 
 function ob_finish() {
-  const keys = {
-    claude: document.getElementById('key-claude').value.trim(),
-    chatgpt: document.getElementById('key-chatgpt').value.trim(),
-    perplexity: document.getElementById('key-perplexity').value.trim(),
-    grok: document.getElementById('key-grok').value.trim()
-  };
   const author = document.getElementById('ob-author').value.trim();
   const projectName = document.getElementById('ob-project-name').value.trim();
 
-  config = { keys, author, passkey: window._validPasskey };
+  config = { author, passkey: window._validPasskey };
   DB.saveConfig(config);
 
   const project = {
@@ -1033,22 +1011,12 @@ function close_modal(id) { document.getElementById(id).classList.remove('open');
 function show_new_project_modal() { show_modal('modal-new-project'); }
 
 function show_settings() {
-  if (config?.keys) {
-    document.getElementById('s-key-claude').value = config.keys.claude || '';
-    document.getElementById('s-key-chatgpt').value = config.keys.chatgpt || '';
-    document.getElementById('s-key-perplexity').value = config.keys.perplexity || '';
-    document.getElementById('s-key-grok').value = config.keys.grok || '';
-  }
+  document.getElementById('s-author').value = config?.author || '';
   show_modal('modal-settings');
 }
 
 function save_settings() {
-  config.keys = {
-    claude: document.getElementById('s-key-claude').value.trim(),
-    chatgpt: document.getElementById('s-key-chatgpt').value.trim(),
-    perplexity: document.getElementById('s-key-perplexity').value.trim(),
-    grok: document.getElementById('s-key-grok').value.trim()
-  };
+  config.author = document.getElementById('s-author').value.trim();
   DB.saveConfig(config);
   close_modal('modal-settings');
 }
