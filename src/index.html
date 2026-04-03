@@ -775,8 +775,17 @@
 
     <div class="ob-progress" id="ob-progress"></div>
 
-    <!-- Step 0: Welcome / API Keys -->
+    <!-- Step 0: Passkey -->
     <div class="ob-step active" id="ob-step-0">
+      <h2>Enter your passkey</h2>
+      <div class="sub">You need a valid passkey to use Scriptorium.</div>
+      <input type="text" id="ob-passkey" placeholder="XXXX-XXXX-XXXX-XXXX" style="text-transform:uppercase; letter-spacing:2px; font-family:var(--font-mono); text-align:center;"/>
+      <div id="passkey-error" style="color:var(--notfound); font-size:13px; margin:-8px 0 12px; display:none;">Invalid passkey. Please check and try again.</div>
+      <button class="btn-primary" onclick="ob_validate_passkey()">Verify →</button>
+    </div>
+
+    <!-- Step 1: API Keys -->
+    <div class="ob-step" id="ob-step-1">
       <h2>Enter your API keys</h2>
       <div class="sub">Stored locally on your machine. Never shared.</div>
       <div class="key-grid">
@@ -785,27 +794,27 @@
         <div class="key-row"><div class="key-label">Perplexity</div><input type="password" id="key-perplexity" placeholder="pplx-..."/></div>
         <div class="key-row"><div class="key-label">xAI (Grok)</div><input type="password" id="key-grok" placeholder="xai-..."/></div>
       </div>
-      <button class="btn-primary" onclick="ob_next(0)">Continue →</button>
-    </div>
-
-    <!-- Step 1: Author name -->
-    <div class="ob-step" id="ob-step-1">
-      <h2>What is your name?</h2>
-      <div class="sub">Your name appears on every published document.</div>
-      <input type="text" id="ob-author" placeholder="Your full name"/>
       <button class="btn-primary" onclick="ob_next(1)">Continue →</button>
     </div>
 
-    <!-- Step 2: First project name -->
+    <!-- Step 2: Author name -->
     <div class="ob-step" id="ob-step-2">
-      <h2>Name your first project</h2>
-      <div class="sub">You can create more projects later.</div>
-      <input type="text" id="ob-project-name" placeholder="e.g. The Hour of Fury"/>
+      <h2>What is your name?</h2>
+      <div class="sub">Your name appears on every published document.</div>
+      <input type="text" id="ob-author" placeholder="Your full name"/>
       <button class="btn-primary" onclick="ob_next(2)">Continue →</button>
     </div>
 
-    <!-- Step 3: Genre -->
+    <!-- Step 3: First project name -->
     <div class="ob-step" id="ob-step-3">
+      <h2>Name your first project</h2>
+      <div class="sub">You can create more projects later.</div>
+      <input type="text" id="ob-project-name" placeholder="e.g. The Hour of Fury"/>
+      <button class="btn-primary" onclick="ob_next(3)">Continue →</button>
+    </div>
+
+    <!-- Step 4: Genre -->
+    <div class="ob-step" id="ob-step-4">
       <h2>What kind of writing is this?</h2>
       <div class="sub">This shapes how every AI in the pipeline responds.</div>
       <div class="option-grid">
@@ -815,11 +824,11 @@
         <button class="option-btn" data-val="journalism" onclick="ob_select(this,'ob-genre')">🗞️ Journalism</button>
       </div>
       <input type="text" id="ob-genre-other" placeholder="Or describe your genre..." style="display:none"/>
-      <button class="btn-primary" onclick="ob_next(3)">Continue →</button>
+      <button class="btn-primary" onclick="ob_next(4)">Continue →</button>
     </div>
 
-    <!-- Step 4: Language -->
-    <div class="ob-step" id="ob-step-4">
+    <!-- Step 5: Language -->
+    <div class="ob-step" id="ob-step-5">
       <h2>Publishing language</h2>
       <div class="sub">All exports will be in your chosen language.</div>
       <div class="option-grid">
@@ -828,11 +837,11 @@
         <button class="option-btn" data-val="both" onclick="ob_select(this,'ob-lang')">Both (EN + AF)</button>
         <button class="option-btn" data-val="other" onclick="ob_select(this,'ob-lang')">Other</button>
       </div>
-      <button class="btn-primary" onclick="ob_next(4)">Continue →</button>
+      <button class="btn-primary" onclick="ob_next(5)">Continue →</button>
     </div>
 
-    <!-- Step 5: Structure -->
-    <div class="ob-step" id="ob-step-5">
+    <!-- Step 6: Structure -->
+    <div class="ob-step" id="ob-step-6">
       <h2>How is this work structured?</h2>
       <div class="sub">This determines how each chapter or piece is organised.</div>
       <div class="option-grid">
@@ -1174,7 +1183,7 @@ let activeChapter = null;
 // ── BOOT ──────────────────────────────────────────────────────────────────
 window.onload = async () => {
   config = await ipcRenderer.invoke('load-config');
-  if (config && config.keys && config.author) {
+  if (config && config.keys && config.author && config.passkey) {
     show_screen('screen-app');
     await refresh_projects();
   } else {
@@ -1190,8 +1199,29 @@ function show_screen(id) {
 }
 
 // ── ONBOARDING ────────────────────────────────────────────────────────────
-const OB_STEPS = 6;
+const OB_STEPS = 7;
 let ob_genre = '', ob_lang = '', ob_structure = '';
+
+// ── PASSKEY VALIDATION ────────────────────────────────────────────────────
+const VALID_PASSKEYS = [
+  'SCRP-2026-ALPHA-7K9M',
+  'SCRP-2026-BETA-3N8X',
+  'SCRP-2026-GAMMA-5J2P',
+  'SCRP-2026-DELTA-9W4R',
+  'SCRP-2026-THETA-1L6C'
+];
+
+function ob_validate_passkey() {
+  const input = document.getElementById('ob-passkey').value.trim().toUpperCase();
+  const errEl = document.getElementById('passkey-error');
+  if (VALID_PASSKEYS.includes(input)) {
+    errEl.style.display = 'none';
+    window._validPasskey = input;
+    ob_next(0);
+  } else {
+    errEl.style.display = 'block';
+  }
+}
 
 function render_ob_progress(current) {
   const el = document.getElementById('ob-progress');
@@ -1224,7 +1254,7 @@ async function ob_finish() {
   const author = document.getElementById('ob-author').value.trim();
   const projectName = document.getElementById('ob-project-name').value.trim();
 
-  config = { keys, author };
+  config = { keys, author, passkey: window._validPasskey };
   await ipcRenderer.invoke('save-config', config);
 
   // Create first project
