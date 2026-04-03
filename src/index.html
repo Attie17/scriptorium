@@ -1,0 +1,1747 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Scriptorium</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,900;1,400&family=IBM+Plex+Mono:wght@400;500&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300&display=swap');
+
+  :root {
+    --bg: #0c0c0e;
+    --surface: #141417;
+    --surface2: #1c1c21;
+    --border: #2a2a32;
+    --accent: #c9a84c;
+    --accent2: #7c6fcd;
+    --verified: #4caf7d;
+    --disputed: #e8a838;
+    --notfound: #e05c5c;
+    --text: #e8e6e0;
+    --text2: #9b9891;
+    --text3: #5a5855;
+    --font-display: 'Playfair Display', Georgia, serif;
+    --font-body: 'Source Serif 4', Georgia, serif;
+    --font-mono: 'IBM Plex Mono', monospace;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    font-size: 15px;
+    line-height: 1.7;
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ── SCREENS ── */
+  .screen { display: none; flex-direction: column; height: 100vh; }
+  .screen.active { display: flex; }
+
+  /* ── ONBOARDING ── */
+  #screen-onboarding {
+    align-items: center;
+    justify-content: center;
+    background: radial-gradient(ellipse at 30% 20%, #1a1520 0%, var(--bg) 60%);
+  }
+
+  .onboarding-inner {
+    width: 560px;
+    max-width: 90vw;
+  }
+
+  .brand {
+    text-align: center;
+    margin-bottom: 52px;
+  }
+
+  .brand h1 {
+    font-family: var(--font-display);
+    font-size: 52px;
+    font-weight: 900;
+    color: var(--accent);
+    letter-spacing: -1px;
+    line-height: 1;
+  }
+
+  .brand p {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text3);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-top: 10px;
+  }
+
+  .ob-step { display: none; }
+  .ob-step.active { display: block; }
+
+  .ob-step h2 {
+    font-family: var(--font-display);
+    font-size: 22px;
+    font-weight: 400;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+
+  .ob-step .sub {
+    font-size: 13px;
+    color: var(--text3);
+    margin-bottom: 28px;
+    font-family: var(--font-mono);
+  }
+
+  .ob-progress {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 36px;
+  }
+
+  .ob-dot {
+    width: 28px;
+    height: 3px;
+    background: var(--border);
+    border-radius: 2px;
+    transition: background 0.3s;
+  }
+
+  .ob-dot.done { background: var(--accent); }
+  .ob-dot.active { background: var(--accent2); }
+
+  input[type="text"], input[type="password"], select, textarea {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: var(--font-body);
+    font-size: 15px;
+    padding: 14px 16px;
+    border-radius: 6px;
+    outline: none;
+    transition: border-color 0.2s;
+    margin-bottom: 14px;
+  }
+
+  input:focus, select:focus, textarea:focus {
+    border-color: var(--accent2);
+  }
+
+  .option-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+
+  .option-btn {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text2);
+    font-family: var(--font-body);
+    font-size: 14px;
+    padding: 14px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.15s;
+  }
+
+  .option-btn:hover { border-color: var(--accent2); color: var(--text); }
+  .option-btn.selected { border-color: var(--accent); color: var(--accent); background: rgba(201,168,76,0.08); }
+
+  .btn-primary {
+    background: var(--accent);
+    color: #0c0c0e;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 14px 28px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: opacity 0.2s;
+    width: 100%;
+    margin-top: 8px;
+  }
+
+  .btn-primary:hover { opacity: 0.85; }
+  .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .key-grid { display: grid; gap: 10px; margin-bottom: 14px; }
+
+  .key-row { position: relative; }
+  .key-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--text3);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  /* ── MAIN APP ── */
+  #screen-app { flex-direction: row; }
+
+  .sidebar {
+    width: 220px;
+    min-width: 220px;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    padding: 20px 0;
+  }
+
+  .sidebar-brand {
+    font-family: var(--font-display);
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--accent);
+    padding: 0 20px 20px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 16px;
+  }
+
+  .sidebar-section {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text3);
+    padding: 0 20px;
+    margin-bottom: 8px;
+  }
+
+  .project-item {
+    padding: 10px 20px;
+    cursor: pointer;
+    border-left: 2px solid transparent;
+    transition: all 0.15s;
+  }
+
+  .project-item:hover { background: var(--surface2); }
+  .project-item.active { border-left-color: var(--accent); background: var(--surface2); }
+
+  .project-item .p-name {
+    font-size: 13px;
+    color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .project-item .p-genre {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--text3);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .btn-new-project {
+    margin: 16px 20px 0;
+    padding: 10px 14px;
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text2);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 1px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .btn-new-project:hover { border-color: var(--accent); color: var(--accent); }
+
+  .sidebar-footer {
+    margin-top: auto;
+    padding: 16px 20px 0;
+    border-top: 1px solid var(--border);
+  }
+
+  .btn-settings {
+    background: none;
+    border: none;
+    color: var(--text3);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    cursor: pointer;
+    letter-spacing: 1px;
+  }
+
+  .btn-settings:hover { color: var(--text2); }
+
+  /* ── MAIN CONTENT ── */
+  .main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* ── WELCOME SCREEN ── */
+  #view-welcome {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  #view-welcome h2 {
+    font-family: var(--font-display);
+    font-size: 32px;
+    font-weight: 400;
+    color: var(--text2);
+  }
+
+  #view-welcome p {
+    color: var(--text3);
+    font-size: 14px;
+  }
+
+  /* ── PROJECT VIEW ── */
+  #view-project {
+    flex: 1;
+    display: none;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .project-header {
+    padding: 20px 28px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--surface);
+  }
+
+  .project-title {
+    font-family: var(--font-display);
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .project-meta {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--text3);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-top: 2px;
+  }
+
+  .btn-new-chapter {
+    background: var(--accent);
+    color: #0c0c0e;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+
+  .btn-new-chapter:hover { opacity: 0.85; }
+
+  /* ── PIPELINE TABS ── */
+  .pipeline-tabs {
+    display: flex;
+    gap: 0;
+    padding: 0 28px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+    overflow-x: auto;
+  }
+
+  .pipeline-tab {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 14px 18px;
+    color: var(--text3);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    white-space: nowrap;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .pipeline-tab:hover { color: var(--text2); }
+  .pipeline-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+  .pipeline-tab.locked { opacity: 0.35; cursor: not-allowed; }
+  .pipeline-tab.done .tab-status { color: var(--verified); }
+
+  .tab-status { font-size: 12px; }
+
+  /* ── STEP VIEWS ── */
+  .step-view { display: none; flex: 1; flex-direction: column; overflow: hidden; }
+  .step-view.active { display: flex; }
+
+  .step-header {
+    padding: 20px 28px 16px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .step-header h3 {
+    font-family: var(--font-display);
+    font-size: 18px;
+    font-weight: 400;
+  }
+
+  .step-header p {
+    font-size: 13px;
+    color: var(--text3);
+    margin-top: 4px;
+  }
+
+  /* ── THREE PANEL LAYOUT ── */
+  .three-panel {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr auto;
+    flex: 1;
+    overflow: hidden;
+    gap: 0;
+  }
+
+  .panel {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border-right: 1px solid var(--border);
+  }
+
+  .panel:last-child { border-right: none; }
+
+  .panel-header {
+    padding: 12px 20px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text3);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .panel-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+  }
+
+  .panel-body::-webkit-scrollbar { width: 4px; }
+  .panel-body::-webkit-scrollbar-track { background: transparent; }
+  .panel-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  .panel-body textarea {
+    width: 100%;
+    height: 100%;
+    min-height: 300px;
+    background: transparent;
+    border: none;
+    color: var(--text);
+    font-family: var(--font-body);
+    font-size: 14px;
+    line-height: 1.8;
+    resize: none;
+    outline: none;
+  }
+
+  .panel-body p, .panel-body .prose {
+    font-size: 14px;
+    line-height: 1.8;
+    color: var(--text);
+    white-space: pre-wrap;
+  }
+
+  /* ── AI LOADING ── */
+  .ai-thinking {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: var(--text3);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    padding: 20px;
+  }
+
+  .spinner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── VERDICT ITEMS ── */
+  .verdict-item {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 14px 16px;
+    margin-bottom: 12px;
+  }
+
+  .verdict-item .claim {
+    font-size: 13px;
+    color: var(--text2);
+    font-style: italic;
+    margin-bottom: 8px;
+    border-left: 2px solid var(--border);
+    padding-left: 10px;
+  }
+
+  .verdict-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 1px;
+    padding: 3px 10px;
+    border-radius: 3px;
+    margin-bottom: 8px;
+  }
+
+  .verdict-badge.verified { background: rgba(76,175,125,0.15); color: var(--verified); }
+  .verdict-badge.disputed { background: rgba(232,168,56,0.15); color: var(--disputed); }
+  .verdict-badge.notfound { background: rgba(224,92,92,0.15); color: var(--notfound); }
+
+  .verdict-reasoning {
+    font-size: 13px;
+    color: var(--text2);
+    line-height: 1.6;
+  }
+
+  /* ── DECISION BAR ── */
+  .decision-bar {
+    grid-column: 1 / -1;
+    padding: 16px 28px;
+    border-top: 1px solid var(--border);
+    background: var(--surface);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .decision-bar .decision-label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text3);
+    letter-spacing: 1px;
+    flex: 1;
+  }
+
+  .btn-approve {
+    background: var(--verified);
+    color: #0c0c0e;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 10px 22px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+
+  .btn-approve:hover { opacity: 0.85; }
+
+  .btn-run {
+    background: var(--accent2);
+    color: white;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 10px 22px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+
+  .btn-run:hover { opacity: 0.85; }
+  .btn-run:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .btn-secondary {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text2);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 1px;
+    padding: 10px 18px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .btn-secondary:hover { border-color: var(--text2); }
+
+  /* ── SETTINGS MODAL ── */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .modal-overlay.open { display: flex; }
+
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    width: 480px;
+    max-width: 90vw;
+    padding: 32px;
+  }
+
+  .modal h2 {
+    font-family: var(--font-display);
+    font-size: 22px;
+    font-weight: 400;
+    margin-bottom: 24px;
+  }
+
+  .modal .close-btn {
+    float: right;
+    background: none;
+    border: none;
+    color: var(--text3);
+    font-size: 20px;
+    cursor: pointer;
+    margin-top: -4px;
+  }
+
+  /* ── NEW PROJECT MODAL ── */
+  .np-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--text3);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+    margin-top: 14px;
+  }
+
+  /* ── STEP INPUT (research step) ── */
+  .step-input-area {
+    padding: 20px 28px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface2);
+  }
+
+  .step-input-area label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--text3);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 8px;
+  }
+
+  .step-input-area input {
+    margin-bottom: 0;
+  }
+
+  /* ── RESULT PANEL ── */
+  .result-panel {
+    display: none;
+    flex-direction: column;
+    border-top: 1px solid var(--border);
+    background: rgba(76,175,125,0.04);
+  }
+
+  .result-panel.visible { display: flex; }
+
+  .result-panel .panel-header {
+    background: rgba(76,175,125,0.08);
+    color: var(--verified);
+  }
+
+  /* Chapter list */
+  .chapter-list {
+    padding: 20px 28px;
+    overflow-y: auto;
+    flex: 1;
+  }
+
+  .chapter-item {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 14px 18px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: border-color 0.15s;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .chapter-item:hover { border-color: var(--accent2); }
+
+  .chapter-item .ch-title { font-size: 14px; color: var(--text); }
+  .chapter-item .ch-status {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--text3);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .status-dot {
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    margin-right: 6px;
+  }
+
+  .status-dot.draft { background: var(--accent2); }
+  .status-dot.inprogress { background: var(--disputed); }
+  .status-dot.complete { background: var(--verified); }
+
+  /* Export step */
+  .export-preview {
+    flex: 1;
+    padding: 40px;
+    overflow-y: auto;
+    font-family: var(--font-body);
+    font-size: 15px;
+    line-height: 1.9;
+    color: var(--text);
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    margin: 20px 28px;
+    white-space: pre-wrap;
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text3);
+    font-size: 13px;
+    font-family: var(--font-mono);
+    letter-spacing: 1px;
+  }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════════ ONBOARDING -->
+<div id="screen-onboarding" class="screen active">
+  <div class="onboarding-inner">
+    <div class="brand">
+      <h1>Scriptorium</h1>
+      <p>Multi-AI Publishing Pipeline</p>
+    </div>
+
+    <div class="ob-progress" id="ob-progress"></div>
+
+    <!-- Step 0: Welcome / API Keys -->
+    <div class="ob-step active" id="ob-step-0">
+      <h2>Enter your API keys</h2>
+      <div class="sub">Stored locally on your machine. Never shared.</div>
+      <div class="key-grid">
+        <div class="key-row"><div class="key-label">Anthropic (Claude)</div><input type="password" id="key-claude" placeholder="sk-ant-..."/></div>
+        <div class="key-row"><div class="key-label">OpenAI (ChatGPT)</div><input type="password" id="key-chatgpt" placeholder="sk-..."/></div>
+        <div class="key-row"><div class="key-label">Perplexity</div><input type="password" id="key-perplexity" placeholder="pplx-..."/></div>
+        <div class="key-row"><div class="key-label">xAI (Grok)</div><input type="password" id="key-grok" placeholder="xai-..."/></div>
+      </div>
+      <button class="btn-primary" onclick="ob_next(0)">Continue →</button>
+    </div>
+
+    <!-- Step 1: Author name -->
+    <div class="ob-step" id="ob-step-1">
+      <h2>What is your name?</h2>
+      <div class="sub">Your name appears on every published document.</div>
+      <input type="text" id="ob-author" placeholder="Your full name"/>
+      <button class="btn-primary" onclick="ob_next(1)">Continue →</button>
+    </div>
+
+    <!-- Step 2: First project name -->
+    <div class="ob-step" id="ob-step-2">
+      <h2>Name your first project</h2>
+      <div class="sub">You can create more projects later.</div>
+      <input type="text" id="ob-project-name" placeholder="e.g. The Hour of Fury"/>
+      <button class="btn-primary" onclick="ob_next(2)">Continue →</button>
+    </div>
+
+    <!-- Step 3: Genre -->
+    <div class="ob-step" id="ob-step-3">
+      <h2>What kind of writing is this?</h2>
+      <div class="sub">This shapes how every AI in the pipeline responds.</div>
+      <div class="option-grid">
+        <button class="option-btn" data-val="history" onclick="ob_select(this,'ob-genre')">📜 History</button>
+        <button class="option-btn" data-val="theology" onclick="ob_select(this,'ob-genre')">✝️ Theology</button>
+        <button class="option-btn" data-val="fiction" onclick="ob_select(this,'ob-genre')">📖 Fiction</button>
+        <button class="option-btn" data-val="journalism" onclick="ob_select(this,'ob-genre')">🗞️ Journalism</button>
+      </div>
+      <input type="text" id="ob-genre-other" placeholder="Or describe your genre..." style="display:none"/>
+      <button class="btn-primary" onclick="ob_next(3)">Continue →</button>
+    </div>
+
+    <!-- Step 4: Language -->
+    <div class="ob-step" id="ob-step-4">
+      <h2>Publishing language</h2>
+      <div class="sub">All exports will be in your chosen language.</div>
+      <div class="option-grid">
+        <button class="option-btn" data-val="en" onclick="ob_select(this,'ob-lang')">English only</button>
+        <button class="option-btn" data-val="af" onclick="ob_select(this,'ob-lang')">Afrikaans only</button>
+        <button class="option-btn" data-val="both" onclick="ob_select(this,'ob-lang')">Both (EN + AF)</button>
+        <button class="option-btn" data-val="other" onclick="ob_select(this,'ob-lang')">Other</button>
+      </div>
+      <button class="btn-primary" onclick="ob_next(4)">Continue →</button>
+    </div>
+
+    <!-- Step 5: Structure -->
+    <div class="ob-step" id="ob-step-5">
+      <h2>How is this work structured?</h2>
+      <div class="sub">This determines how each chapter or piece is organised.</div>
+      <div class="option-grid">
+        <button class="option-btn" data-val="weekly" onclick="ob_select(this,'ob-structure')">Weekly chapters</button>
+        <button class="option-btn" data-val="chapters" onclick="ob_select(this,'ob-structure')">Book chapters</button>
+        <button class="option-btn" data-val="standalone" onclick="ob_select(this,'ob-structure')">Standalone pieces</button>
+        <button class="option-btn" data-val="episodes" onclick="ob_select(this,'ob-structure')">Episodes / stories</button>
+      </div>
+      <button class="btn-primary" onclick="ob_finish()">Enter Scriptorium →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ MAIN APP -->
+<div id="screen-app" class="screen">
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-brand">Scriptorium</div>
+    <div class="sidebar-section">Projects</div>
+    <div id="project-list"></div>
+    <button class="btn-new-project" onclick="show_new_project_modal()">+ New Project</button>
+    <div class="sidebar-footer">
+      <button class="btn-settings" onclick="show_settings()">⚙ Settings</button>
+    </div>
+  </div>
+
+  <!-- Main content -->
+  <div class="main-content">
+
+    <!-- Welcome state -->
+    <div id="view-welcome">
+      <h2>Select a project</h2>
+      <p>Or create a new one to begin.</p>
+    </div>
+
+    <!-- Project view -->
+    <div id="view-project">
+
+      <!-- Project header -->
+      <div class="project-header">
+        <div>
+          <div class="project-title" id="pv-title">—</div>
+          <div class="project-meta" id="pv-meta">—</div>
+        </div>
+        <button class="btn-new-chapter" onclick="new_chapter()">+ New Chapter</button>
+      </div>
+
+      <!-- Chapter list OR pipeline -->
+      <div id="pv-chapter-list" style="display:flex;flex:1;flex-direction:column;overflow:hidden;">
+        <div class="chapter-list" id="chapter-list-inner">
+          <div class="empty-state">No chapters yet. Click "+ New Chapter" to begin.</div>
+        </div>
+      </div>
+
+      <!-- Pipeline view (shown when a chapter is open) -->
+      <div id="pv-pipeline" style="display:none;flex:1;flex-direction:column;overflow:hidden;">
+
+        <!-- Pipeline tabs -->
+        <div class="pipeline-tabs">
+          <div class="pipeline-tab active" data-step="research" onclick="switch_step('research')">
+            <span class="tab-status" id="ts-research">○</span> 1. Research
+          </div>
+          <div class="pipeline-tab locked" data-step="write" onclick="switch_step('write')">
+            <span class="tab-status" id="ts-write">○</span> 2. Write
+          </div>
+          <div class="pipeline-tab locked" data-step="factcheck" onclick="switch_step('factcheck')">
+            <span class="tab-status" id="ts-factcheck">○</span> 3. Fact-Check
+          </div>
+          <div class="pipeline-tab locked" data-step="sourcecheck" onclick="switch_step('sourcecheck')">
+            <span class="tab-status" id="ts-sourcecheck">○</span> 4. Sources
+          </div>
+          <div class="pipeline-tab locked" data-step="editorial" onclick="switch_step('editorial')">
+            <span class="tab-status" id="ts-editorial">○</span> 5. Editorial
+          </div>
+          <div class="pipeline-tab locked" data-step="export" onclick="switch_step('export')">
+            <span class="tab-status" id="ts-export">○</span> 6. Export
+          </div>
+          <div style="margin-left:auto;padding:0 8px;display:flex;align-items:center;">
+            <button class="btn-secondary" onclick="back_to_chapters()" style="font-size:10px;padding:6px 12px;">← All Chapters</button>
+          </div>
+        </div>
+
+        <!-- ── STEP: RESEARCH ── -->
+        <div class="step-view active" id="step-research">
+          <div class="step-header">
+            <h3>Step 1 — Research</h3>
+            <p>Enter your topic. Perplexity finds sources. Grok verifies current facts. You approve the brief before writing begins.</p>
+          </div>
+          <div class="step-input-area">
+            <label>Topic / Question for this chapter</label>
+            <input type="text" id="research-topic" placeholder="e.g. The Iran War — Week 5: March 29 – April 4, 2026"/>
+          </div>
+          <div class="three-panel">
+            <div class="panel">
+              <div class="panel-header">
+                <span>Perplexity — Sources & Facts</span>
+                <span id="perp-status"></span>
+              </div>
+              <div class="panel-body" id="perp-result">
+                <div class="empty-state">Run research to see results</div>
+              </div>
+            </div>
+            <div class="panel">
+              <div class="panel-header">
+                <span>Grok — Current Events</span>
+                <span id="grok-status"></span>
+              </div>
+              <div class="panel-body" id="grok-result">
+                <div class="empty-state">Run research to see results</div>
+              </div>
+            </div>
+            <div class="decision-bar">
+              <span class="decision-label">Review both panels, then edit the research brief below before approving.</span>
+              <button class="btn-run" id="btn-run-research" onclick="run_research()">Run Research</button>
+              <button class="btn-approve" id="btn-approve-research" style="display:none" onclick="approve_research()">Approve & Write →</button>
+            </div>
+          </div>
+          <!-- Editable brief -->
+          <div style="padding:16px 28px;border-top:1px solid var(--border);background:var(--surface2);">
+            <div class="panel-header" style="padding:0;margin-bottom:10px;background:none;">
+              <span>Research Brief — edit before approving</span>
+            </div>
+            <textarea id="research-brief" style="width:100%;min-height:120px;background:var(--surface);border:1px solid var(--border);color:var(--text);font-family:var(--font-body);font-size:14px;padding:14px;border-radius:6px;resize:vertical;outline:none;" placeholder="The AI summaries above will populate here automatically. You can edit before approving."></textarea>
+          </div>
+        </div>
+
+        <!-- ── STEP: WRITE ── -->
+        <div class="step-view" id="step-write">
+          <div class="step-header">
+            <h3>Step 2 — Write</h3>
+            <p>Claude drafts the chapter from your approved brief. Edit directly before approving.</p>
+          </div>
+          <div class="three-panel">
+            <div class="panel">
+              <div class="panel-header"><span>Approved Research Brief</span></div>
+              <div class="panel-body" id="write-brief-display"><div class="empty-state">Brief will appear here</div></div>
+            </div>
+            <div class="panel">
+              <div class="panel-header"><span>Claude — Draft Chapter</span><span id="claude-status"></span></div>
+              <div class="panel-body">
+                <textarea id="write-draft" placeholder="Draft will appear here. You can edit directly." style="width:100%;height:100%;min-height:400px;background:transparent;border:none;color:var(--text);font-family:var(--font-body);font-size:14px;line-height:1.8;resize:none;outline:none;"></textarea>
+              </div>
+            </div>
+            <div class="decision-bar">
+              <span class="decision-label">Review the draft. Edit directly in the right panel. Approve when ready.</span>
+              <button class="btn-run" id="btn-run-write" onclick="run_write()">Generate Draft</button>
+              <button class="btn-approve" id="btn-approve-write" style="display:none" onclick="approve_write()">Approve Draft →</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── STEP: FACT-CHECK ── -->
+        <div class="step-view" id="step-factcheck">
+          <div class="step-header">
+            <h3>Step 3 — Fact-Check</h3>
+            <p>Grok checks every factual claim. You see the original, the verdicts, and apply only the changes you approve.</p>
+          </div>
+          <div class="three-panel">
+            <div class="panel">
+              <div class="panel-header"><span>Original Draft</span></div>
+              <div class="panel-body" id="fc-original"><div class="empty-state">Original draft will appear here</div></div>
+            </div>
+            <div class="panel">
+              <div class="panel-header"><span>Grok — Fact Verdicts</span><span id="grok-fc-status"></span></div>
+              <div class="panel-body" id="fc-verdicts"><div class="empty-state">Run fact-check to see verdicts</div></div>
+            </div>
+            <div class="decision-bar">
+              <span class="decision-label">Review each verdict. The result panel below updates as you approve changes.</span>
+              <button class="btn-run" id="btn-run-fc" onclick="run_factcheck()">Run Fact-Check</button>
+              <button class="btn-approve" id="btn-approve-fc" style="display:none" onclick="approve_factcheck()">Approve & Continue →</button>
+            </div>
+          </div>
+          <div class="result-panel" id="fc-result-panel">
+            <div class="panel-header"><span>✓ Result — Corrected Draft</span></div>
+            <div class="panel-body">
+              <textarea id="fc-result-text" style="width:100%;height:100%;min-height:200px;background:transparent;border:none;color:var(--text);font-family:var(--font-body);font-size:14px;line-height:1.8;resize:none;outline:none;"></textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── STEP: SOURCE CHECK ── -->
+        <div class="step-view" id="step-sourcecheck">
+          <div class="step-header">
+            <h3>Step 4 — Source Check</h3>
+            <p>Perplexity verifies every citation. You see the original sources, the verdicts, and approve the final list.</p>
+          </div>
+          <div class="three-panel">
+            <div class="panel">
+              <div class="panel-header"><span>Draft with Sources</span></div>
+              <div class="panel-body" id="sc-original"><div class="empty-state">Draft will appear here</div></div>
+            </div>
+            <div class="panel">
+              <div class="panel-header"><span>Perplexity — Source Verdicts</span><span id="perp-sc-status"></span></div>
+              <div class="panel-body" id="sc-verdicts"><div class="empty-state">Run source check to see verdicts</div></div>
+            </div>
+            <div class="decision-bar">
+              <span class="decision-label">Review source verdicts. Edit result below as needed.</span>
+              <button class="btn-run" id="btn-run-sc" onclick="run_sourcecheck()">Run Source Check</button>
+              <button class="btn-approve" id="btn-approve-sc" style="display:none" onclick="approve_sourcecheck()">Approve & Continue →</button>
+            </div>
+          </div>
+          <div class="result-panel" id="sc-result-panel">
+            <div class="panel-header"><span>✓ Result — Verified Draft</span></div>
+            <div class="panel-body">
+              <textarea id="sc-result-text" style="width:100%;height:100%;min-height:200px;background:transparent;border:none;color:var(--text);font-family:var(--font-body);font-size:14px;line-height:1.8;resize:none;outline:none;"></textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── STEP: EDITORIAL ── -->
+        <div class="step-view" id="step-editorial">
+          <div class="step-header">
+            <h3>Step 5 — Editorial Review</h3>
+            <p>ChatGPT reads the full chapter as a fresh editor. You see its notes, then decide what to apply.</p>
+          </div>
+          <div class="three-panel">
+            <div class="panel">
+              <div class="panel-header"><span>Current Draft</span></div>
+              <div class="panel-body" id="ed-original"><div class="empty-state">Draft will appear here</div></div>
+            </div>
+            <div class="panel">
+              <div class="panel-header"><span>ChatGPT — Editorial Notes</span><span id="chatgpt-status"></span></div>
+              <div class="panel-body" id="ed-notes"><div class="empty-state">Run editorial review to see notes</div></div>
+            </div>
+            <div class="decision-bar">
+              <span class="decision-label">Apply editorial changes in the result panel below. Final draft is yours.</span>
+              <button class="btn-run" id="btn-run-ed" onclick="run_editorial()">Run Editorial</button>
+              <button class="btn-approve" id="btn-approve-ed" style="display:none" onclick="approve_editorial()">Approve Final Draft →</button>
+            </div>
+          </div>
+          <div class="result-panel" id="ed-result-panel">
+            <div class="panel-header"><span>✓ Final Approved Draft — edit here</span></div>
+            <div class="panel-body">
+              <textarea id="ed-result-text" style="width:100%;height:100%;min-height:200px;background:transparent;border:none;color:var(--text);font-family:var(--font-body);font-size:14px;line-height:1.8;resize:none;outline:none;"></textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── STEP: EXPORT ── -->
+        <div class="step-view" id="step-export">
+          <div class="step-header">
+            <h3>Step 6 — Export</h3>
+            <p>Your approved chapter formatted to KDP spec. Download as .docx for Amazon or any publisher.</p>
+          </div>
+          <div style="flex:1;display:flex;flex-direction:column;overflow:hidden;padding:20px 28px;gap:16px;">
+            <div style="display:flex;gap:12px;align-items:center;">
+              <button class="btn-run" onclick="export_docx()">⬇ Export .docx for KDP</button>
+              <div id="export-lang-toggle" style="display:none;">
+                <button class="btn-secondary" onclick="export_afrikaans()">⬇ Export Afrikaans .docx</button>
+              </div>
+              <span id="export-status" style="font-family:var(--font-mono);font-size:11px;color:var(--text3);"></span>
+            </div>
+            <div class="export-preview" id="export-preview">
+              Final chapter will appear here for review before export.
+            </div>
+          </div>
+        </div>
+
+      </div><!-- end pipeline -->
+    </div><!-- end view-project -->
+  </div><!-- end main-content -->
+</div><!-- end screen-app -->
+
+<!-- ══════════════════════════════════════════════════════ MODALS -->
+
+<!-- Settings -->
+<div class="modal-overlay" id="modal-settings">
+  <div class="modal">
+    <button class="close-btn" onclick="close_modal('modal-settings')">×</button>
+    <h2>Settings</h2>
+    <div class="key-label">Anthropic (Claude)</div>
+    <input type="password" id="s-key-claude"/>
+    <div class="key-label">OpenAI (ChatGPT)</div>
+    <input type="password" id="s-key-chatgpt"/>
+    <div class="key-label">Perplexity</div>
+    <input type="password" id="s-key-perplexity"/>
+    <div class="key-label">xAI (Grok)</div>
+    <input type="password" id="s-key-grok"/>
+    <button class="btn-primary" style="margin-top:16px;" onclick="save_settings()">Save Keys</button>
+  </div>
+</div>
+
+<!-- New Project -->
+<div class="modal-overlay" id="modal-new-project">
+  <div class="modal">
+    <button class="close-btn" onclick="close_modal('modal-new-project')">×</button>
+    <h2>New Project</h2>
+    <div class="np-label">Project Name</div>
+    <input type="text" id="np-name" placeholder="e.g. The Prophets and the Bombs"/>
+    <div class="np-label">Genre</div>
+    <select id="np-genre">
+      <option value="history">History</option>
+      <option value="theology">Theology</option>
+      <option value="fiction">Fiction</option>
+      <option value="journalism">Journalism</option>
+      <option value="other">Other</option>
+    </select>
+    <div class="np-label">Language</div>
+    <select id="np-lang">
+      <option value="en">English only</option>
+      <option value="af">Afrikaans only</option>
+      <option value="both">English + Afrikaans</option>
+    </select>
+    <div class="np-label">Structure</div>
+    <select id="np-structure">
+      <option value="weekly">Weekly chapters</option>
+      <option value="chapters">Book chapters</option>
+      <option value="standalone">Standalone pieces</option>
+      <option value="episodes">Episodes / stories</option>
+    </select>
+    <div class="np-label">Author</div>
+    <input type="text" id="np-author"/>
+    <button class="btn-primary" style="margin-top:16px;" onclick="create_project()">Create Project</button>
+  </div>
+</div>
+
+<!-- New Chapter -->
+<div class="modal-overlay" id="modal-new-chapter">
+  <div class="modal">
+    <button class="close-btn" onclick="close_modal('modal-new-chapter')">×</button>
+    <h2>New Chapter</h2>
+    <div class="np-label">Chapter Title</div>
+    <input type="text" id="nc-title" placeholder="e.g. Week Five — March 29 to April 4"/>
+    <button class="btn-primary" style="margin-top:16px;" onclick="create_chapter()">Begin Pipeline →</button>
+  </div>
+</div>
+
+<script>
+const { ipcRenderer } = require('electron');
+const { STEP_PROMPTS } = require('./pipeline.js');
+
+// ── STATE ─────────────────────────────────────────────────────────────────
+let config = null;
+let projects = [];
+let activeProject = null;
+let activeChapter = null;
+
+// ── BOOT ──────────────────────────────────────────────────────────────────
+window.onload = async () => {
+  config = await ipcRenderer.invoke('load-config');
+  if (config && config.keys && config.author) {
+    show_screen('screen-app');
+    await refresh_projects();
+  } else {
+    show_screen('screen-onboarding');
+    render_ob_progress(0);
+  }
+};
+
+// ── SCREENS ───────────────────────────────────────────────────────────────
+function show_screen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+// ── ONBOARDING ────────────────────────────────────────────────────────────
+const OB_STEPS = 6;
+let ob_genre = '', ob_lang = '', ob_structure = '';
+
+function render_ob_progress(current) {
+  const el = document.getElementById('ob-progress');
+  el.innerHTML = Array.from({length: OB_STEPS}, (_, i) =>
+    `<div class="ob-dot ${i < current ? 'done' : i === current ? 'active' : ''}"></div>`
+  ).join('');
+}
+
+function ob_select(btn, key) {
+  btn.closest('.ob-step').querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  if (key === 'ob-genre') ob_genre = btn.dataset.val;
+  if (key === 'ob-lang') ob_lang = btn.dataset.val;
+  if (key === 'ob-structure') ob_structure = btn.dataset.val;
+}
+
+function ob_next(step) {
+  document.getElementById(`ob-step-${step}`).classList.remove('active');
+  document.getElementById(`ob-step-${step+1}`).classList.add('active');
+  render_ob_progress(step+1);
+}
+
+async function ob_finish() {
+  const keys = {
+    claude: document.getElementById('key-claude').value.trim(),
+    chatgpt: document.getElementById('key-chatgpt').value.trim(),
+    perplexity: document.getElementById('key-perplexity').value.trim(),
+    grok: document.getElementById('key-grok').value.trim()
+  };
+  const author = document.getElementById('ob-author').value.trim();
+  const projectName = document.getElementById('ob-project-name').value.trim();
+
+  config = { keys, author };
+  await ipcRenderer.invoke('save-config', config);
+
+  // Create first project
+  const project = {
+    id: Date.now().toString(),
+    name: projectName || 'My First Project',
+    genre: ob_genre || 'history',
+    language: ob_lang || 'en',
+    structure: ob_structure || 'chapters',
+    author,
+    chapters: [],
+    createdAt: new Date().toISOString()
+  };
+  await ipcRenderer.invoke('save-project', project);
+
+  show_screen('screen-app');
+  await refresh_projects();
+  open_project(project.id);
+}
+
+// ── PROJECTS ──────────────────────────────────────────────────────────────
+async function refresh_projects() {
+  projects = await ipcRenderer.invoke('list-projects');
+  render_project_list();
+}
+
+function render_project_list() {
+  const el = document.getElementById('project-list');
+  if (!projects.length) { el.innerHTML = ''; return; }
+  el.innerHTML = projects.map(p => `
+    <div class="project-item ${activeProject?.id === p.id ? 'active' : ''}" onclick="open_project('${p.id}')">
+      <div class="p-name">${p.name}</div>
+      <div class="p-genre">${p.genre}</div>
+    </div>
+  `).join('');
+}
+
+async function open_project(id) {
+  activeProject = await ipcRenderer.invoke('load-project', id);
+  activeChapter = null;
+  document.getElementById('pv-title').textContent = activeProject.name;
+  document.getElementById('pv-meta').textContent =
+    `${activeProject.genre.toUpperCase()} · ${activeProject.language.toUpperCase()} · ${activeProject.structure}`;
+  document.getElementById('view-welcome').style.display = 'none';
+  document.getElementById('view-project').style.display = 'flex';
+  document.getElementById('pv-chapter-list').style.display = 'flex';
+  document.getElementById('pv-pipeline').style.display = 'none';
+  render_chapter_list();
+  render_project_list();
+
+  // Show Afrikaans export option if relevant
+  document.getElementById('export-lang-toggle').style.display =
+    (activeProject.language === 'both' || activeProject.language === 'af') ? 'block' : 'none';
+
+  // Pre-fill author in new project modal
+  document.getElementById('np-author').value = config?.author || '';
+}
+
+function render_chapter_list() {
+  const el = document.getElementById('chapter-list-inner');
+  const chapters = activeProject?.chapters || [];
+  if (!chapters.length) {
+    el.innerHTML = '<div class="empty-state">No chapters yet. Click "+ New Chapter" to begin.</div>';
+    return;
+  }
+  el.innerHTML = chapters.map(ch => `
+    <div class="chapter-item" onclick="open_chapter('${ch.id}')">
+      <div>
+        <div class="ch-title">${ch.title}</div>
+        <div class="ch-status" style="margin-top:4px;">
+          <span class="status-dot ${ch.step === 'export' ? 'complete' : ch.step === 'research' ? 'draft' : 'inprogress'}"></span>
+          ${ch.step?.toUpperCase() || 'NEW'}
+        </div>
+      </div>
+      <div style="font-family:var(--font-mono);font-size:10px;color:var(--text3);">
+        ${ch.updatedAt ? new Date(ch.updatedAt).toLocaleDateString() : ''}
+      </div>
+    </div>
+  `).join('');
+}
+
+function back_to_chapters() {
+  document.getElementById('pv-chapter-list').style.display = 'flex';
+  document.getElementById('pv-pipeline').style.display = 'none';
+  activeChapter = null;
+}
+
+// ── CHAPTERS ──────────────────────────────────────────────────────────────
+function new_chapter() { show_modal('modal-new-chapter'); }
+
+async function create_chapter() {
+  const title = document.getElementById('nc-title').value.trim();
+  if (!title) return;
+  const ch = {
+    id: Date.now().toString(),
+    title,
+    step: 'research',
+    stepsDone: [],
+    data: {}
+  };
+  activeProject.chapters = activeProject.chapters || [];
+  activeProject.chapters.push(ch);
+  await ipcRenderer.invoke('save-project', activeProject);
+  close_modal('modal-new-chapter');
+  document.getElementById('nc-title').value = '';
+  open_chapter(ch.id);
+}
+
+function open_chapter(id) {
+  activeChapter = activeProject.chapters.find(c => c.id === id);
+  document.getElementById('pv-chapter-list').style.display = 'none';
+  document.getElementById('pv-pipeline').style.display = 'flex';
+  restore_chapter_state();
+  switch_step(activeChapter.step || 'research');
+}
+
+function restore_chapter_state() {
+  const d = activeChapter.data || {};
+  if (d.researchTopic) document.getElementById('research-topic').value = d.researchTopic;
+  if (d.researchBrief) document.getElementById('research-brief').value = d.researchBrief;
+  if (d.perpResult) set_panel('perp-result', d.perpResult);
+  if (d.grokResult) set_panel('grok-result', d.grokResult);
+  if (d.writeDraft) document.getElementById('write-draft').value = d.writeDraft;
+  if (d.fcResult) document.getElementById('fc-result-text').value = d.fcResult;
+  if (d.scResult) document.getElementById('sc-result-text').value = d.scResult;
+  if (d.edResult) document.getElementById('ed-result-text').value = d.edResult;
+
+  // Update tab states
+  const done = activeChapter.stepsDone || [];
+  const steps = ['research','write','factcheck','sourcecheck','editorial','export'];
+  steps.forEach((s, i) => {
+    const tab = document.querySelector(`.pipeline-tab[data-step="${s}"]`);
+    if (!tab) return;
+    if (done.includes(s)) {
+      tab.classList.remove('locked');
+      tab.classList.add('done');
+      document.getElementById(`ts-${s}`).textContent = '✓';
+    } else if (i === 0 || done.includes(steps[i-1])) {
+      tab.classList.remove('locked');
+    }
+  });
+}
+
+async function save_chapter() {
+  const idx = activeProject.chapters.findIndex(c => c.id === activeChapter.id);
+  activeProject.chapters[idx] = activeChapter;
+  activeProject.updatedAt = new Date().toISOString();
+  await ipcRenderer.invoke('save-project', activeProject);
+}
+
+// ── STEP NAVIGATION ───────────────────────────────────────────────────────
+function switch_step(step) {
+  const tab = document.querySelector(`.pipeline-tab[data-step="${step}"]`);
+  if (tab?.classList.contains('locked')) return;
+
+  document.querySelectorAll('.pipeline-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.step-view').forEach(v => v.classList.remove('active'));
+  tab?.classList.add('active');
+  document.getElementById(`step-${step}`)?.classList.add('active');
+
+  // Populate panels when switching
+  if (step === 'write') populate_write_step();
+  if (step === 'factcheck') populate_fc_step();
+  if (step === 'sourcecheck') populate_sc_step();
+  if (step === 'editorial') populate_ed_step();
+  if (step === 'export') populate_export_step();
+}
+
+function unlock_step(step) {
+  const tab = document.querySelector(`.pipeline-tab[data-step="${step}"]`);
+  if (tab) tab.classList.remove('locked');
+  activeChapter.stepsDone = activeChapter.stepsDone || [];
+  if (!activeChapter.stepsDone.includes(step)) {
+    // Mark previous step done
+  }
+}
+
+// ── AI CALL HELPER ────────────────────────────────────────────────────────
+async function ai(provider, prompt, systemPrompt, statusEl) {
+  if (statusEl) document.getElementById(statusEl).innerHTML =
+    '<div class="ai-thinking"><div class="spinner"></div>Thinking...</div>';
+  const result = await ipcRenderer.invoke('ai-call', { provider, prompt, systemPrompt });
+  return result;
+}
+
+function set_panel(id, text) {
+  const el = document.getElementById(id);
+  el.innerHTML = `<div class="prose">${text.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>`;
+}
+
+// ── STEP 1: RESEARCH ──────────────────────────────────────────────────────
+async function run_research() {
+  const topic = document.getElementById('research-topic').value.trim();
+  if (!topic) { alert('Please enter a topic first.'); return; }
+
+  document.getElementById('btn-run-research').disabled = true;
+  const genre = activeProject.genre;
+  const lang = activeProject.language;
+  const prompts = STEP_PROMPTS.research(genre, topic, lang);
+
+  const [perpRes, grokRes] = await Promise.all([
+    ai('perplexity', prompts.perplexity, null, 'perp-status'),
+    ai('grok', prompts.grok, null, 'grok-status')
+  ]);
+
+  const perpText = perpRes.error ? `Error: ${perpRes.error}` : perpRes.text;
+  const grokText = grokRes.error ? `Error: ${grokRes.error}` : grokRes.text;
+
+  set_panel('perp-result', perpText);
+  set_panel('grok-result', grokText);
+  document.getElementById('perp-status').textContent = perpRes.error ? '✗' : '✓';
+  document.getElementById('grok-status').textContent = grokRes.error ? '✗' : '✓';
+
+  // Auto-populate brief
+  document.getElementById('research-brief').value =
+    `PERPLEXITY FINDINGS:\n${perpText}\n\n---\n\nGROK FINDINGS:\n${grokText}`;
+
+  // Save
+  activeChapter.data.researchTopic = topic;
+  activeChapter.data.perpResult = perpText;
+  activeChapter.data.grokResult = grokText;
+  activeChapter.data.researchBrief = document.getElementById('research-brief').value;
+  await save_chapter();
+
+  document.getElementById('btn-approve-research').style.display = 'inline-flex';
+  document.getElementById('btn-run-research').disabled = false;
+}
+
+async function approve_research() {
+  activeChapter.data.researchBrief = document.getElementById('research-brief').value;
+  activeChapter.step = 'write';
+  activeChapter.stepsDone = activeChapter.stepsDone || [];
+  activeChapter.stepsDone.push('research');
+  document.getElementById('ts-research').textContent = '✓';
+  document.querySelector('.pipeline-tab[data-step="research"]').classList.add('done');
+  unlock_step('write');
+  await save_chapter();
+  switch_step('write');
+}
+
+// ── STEP 2: WRITE ─────────────────────────────────────────────────────────
+function populate_write_step() {
+  const brief = activeChapter.data?.researchBrief || '';
+  const el = document.getElementById('write-brief-display');
+  el.innerHTML = brief ? `<div class="prose">${brief.replace(/</g,'&lt;')}</div>` : '<div class="empty-state">No brief found</div>';
+  if (activeChapter.data?.writeDraft) {
+    document.getElementById('write-draft').value = activeChapter.data.writeDraft;
+    document.getElementById('btn-approve-write').style.display = 'inline-flex';
+  }
+}
+
+async function run_write() {
+  document.getElementById('btn-run-write').disabled = true;
+  const brief = activeChapter.data?.researchBrief || '';
+  const genre = activeProject.genre;
+  const lang = activeProject.language;
+  const title = activeChapter.title;
+  const prompts = STEP_PROMPTS.write(genre, brief, title, lang);
+
+  const result = await ai('claude', prompts.claude, null, 'claude-status');
+  const text = result.error ? `Error: ${result.error}` : result.text;
+
+  document.getElementById('write-draft').value = text;
+  document.getElementById('claude-status').textContent = result.error ? '✗' : '✓';
+
+  activeChapter.data.writeDraft = text;
+  await save_chapter();
+
+  document.getElementById('btn-approve-write').style.display = 'inline-flex';
+  document.getElementById('btn-run-write').disabled = false;
+}
+
+async function approve_write() {
+  activeChapter.data.writeDraft = document.getElementById('write-draft').value;
+  activeChapter.step = 'factcheck';
+  activeChapter.stepsDone.push('write');
+  document.getElementById('ts-write').textContent = '✓';
+  document.querySelector('.pipeline-tab[data-step="write"]').classList.add('done');
+  unlock_step('factcheck');
+  await save_chapter();
+  switch_step('factcheck');
+}
+
+// ── STEP 3: FACT-CHECK ────────────────────────────────────────────────────
+function populate_fc_step() {
+  const draft = activeChapter.data?.writeDraft || '';
+  const el = document.getElementById('fc-original');
+  el.innerHTML = draft ? `<div class="prose">${draft.replace(/</g,'&lt;')}</div>` : '<div class="empty-state">No draft found</div>';
+  if (activeChapter.data?.fcResult) {
+    document.getElementById('fc-result-text').value = activeChapter.data.fcResult;
+    document.getElementById('fc-result-panel').classList.add('visible');
+    document.getElementById('btn-approve-fc').style.display = 'inline-flex';
+  }
+}
+
+async function run_factcheck() {
+  document.getElementById('btn-run-fc').disabled = true;
+  const draft = activeChapter.data?.writeDraft || '';
+  const genre = activeProject.genre;
+  const prompts = STEP_PROMPTS.factcheck(genre, draft);
+
+  const result = await ai('grok', prompts.grok, null, 'grok-fc-status');
+  const text = result.error ? `Error: ${result.error}` : result.text;
+
+  set_panel('fc-verdicts', text);
+  document.getElementById('grok-fc-status').textContent = result.error ? '✗' : '✓';
+
+  // Ask Claude to apply the corrections
+  const applyResult = await ai('claude',
+    `You are an editor. Here is the original draft:\n\n${draft}\n\n---\n\nHere are the fact-check verdicts from Grok:\n\n${text}\n\n---\n\nApply only the ⚠️ Disputed and ❌ Not found corrections. Keep the author's voice. Return the corrected draft only.`,
+    null, 'claude-status'
+  );
+  const corrected = applyResult.error ? draft : applyResult.text;
+
+  document.getElementById('fc-result-text').value = corrected;
+  document.getElementById('fc-result-panel').classList.add('visible');
+
+  activeChapter.data.fcVerdicts = text;
+  activeChapter.data.fcResult = corrected;
+  await save_chapter();
+
+  document.getElementById('btn-approve-fc').style.display = 'inline-flex';
+  document.getElementById('btn-run-fc').disabled = false;
+}
+
+async function approve_factcheck() {
+  activeChapter.data.fcResult = document.getElementById('fc-result-text').value;
+  activeChapter.step = 'sourcecheck';
+  activeChapter.stepsDone.push('factcheck');
+  document.getElementById('ts-factcheck').textContent = '✓';
+  document.querySelector('.pipeline-tab[data-step="factcheck"]').classList.add('done');
+  unlock_step('sourcecheck');
+  await save_chapter();
+  switch_step('sourcecheck');
+}
+
+// ── STEP 4: SOURCE CHECK ──────────────────────────────────────────────────
+function populate_sc_step() {
+  const draft = activeChapter.data?.fcResult || activeChapter.data?.writeDraft || '';
+  const el = document.getElementById('sc-original');
+  el.innerHTML = draft ? `<div class="prose">${draft.replace(/</g,'&lt;')}</div>` : '<div class="empty-state">No draft found</div>';
+  if (activeChapter.data?.scResult) {
+    document.getElementById('sc-result-text').value = activeChapter.data.scResult;
+    document.getElementById('sc-result-panel').classList.add('visible');
+    document.getElementById('btn-approve-sc').style.display = 'inline-flex';
+  }
+}
+
+async function run_sourcecheck() {
+  document.getElementById('btn-run-sc').disabled = true;
+  const draft = activeChapter.data?.fcResult || activeChapter.data?.writeDraft || '';
+  const genre = activeProject.genre;
+  const prompts = STEP_PROMPTS.sourcecheck(genre, draft);
+
+  const result = await ai('perplexity', prompts.perplexity, null, 'perp-sc-status');
+  const text = result.error ? `Error: ${result.error}` : result.text;
+
+  set_panel('sc-verdicts', text);
+  document.getElementById('perp-sc-status').textContent = result.error ? '✗' : '✓';
+
+  document.getElementById('sc-result-text').value = draft;
+  document.getElementById('sc-result-panel').classList.add('visible');
+
+  activeChapter.data.scVerdicts = text;
+  activeChapter.data.scResult = draft;
+  await save_chapter();
+
+  document.getElementById('btn-approve-sc').style.display = 'inline-flex';
+  document.getElementById('btn-run-sc').disabled = false;
+}
+
+async function approve_sourcecheck() {
+  activeChapter.data.scResult = document.getElementById('sc-result-text').value;
+  activeChapter.step = 'editorial';
+  activeChapter.stepsDone.push('sourcecheck');
+  document.getElementById('ts-sourcecheck').textContent = '✓';
+  document.querySelector('.pipeline-tab[data-step="sourcecheck"]').classList.add('done');
+  unlock_step('editorial');
+  await save_chapter();
+  switch_step('editorial');
+}
+
+// ── STEP 5: EDITORIAL ─────────────────────────────────────────────────────
+function populate_ed_step() {
+  const draft = activeChapter.data?.scResult || activeChapter.data?.fcResult || '';
+  const el = document.getElementById('ed-original');
+  el.innerHTML = draft ? `<div class="prose">${draft.replace(/</g,'&lt;')}</div>` : '<div class="empty-state">No draft found</div>';
+  if (activeChapter.data?.edResult) {
+    document.getElementById('ed-result-text').value = activeChapter.data.edResult;
+    document.getElementById('ed-result-panel').classList.add('visible');
+    document.getElementById('btn-approve-ed').style.display = 'inline-flex';
+  }
+}
+
+async function run_editorial() {
+  document.getElementById('btn-run-ed').disabled = true;
+  const draft = activeChapter.data?.scResult || activeChapter.data?.fcResult || '';
+  const genre = activeProject.genre;
+  const prompts = STEP_PROMPTS.editorial(genre, draft);
+
+  const result = await ai('chatgpt', prompts.chatgpt, null, 'chatgpt-status');
+  const text = result.error ? `Error: ${result.error}` : result.text;
+
+  set_panel('ed-notes', text);
+  document.getElementById('chatgpt-status').textContent = result.error ? '✗' : '✓';
+
+  document.getElementById('ed-result-text').value = draft;
+  document.getElementById('ed-result-panel').classList.add('visible');
+
+  activeChapter.data.editorialNotes = text;
+  activeChapter.data.edResult = draft;
+  await save_chapter();
+
+  document.getElementById('btn-approve-ed').style.display = 'inline-flex';
+  document.getElementById('btn-run-ed').disabled = false;
+}
+
+async function approve_editorial() {
+  activeChapter.data.edResult = document.getElementById('ed-result-text').value;
+  activeChapter.step = 'export';
+  activeChapter.stepsDone.push('editorial');
+  document.getElementById('ts-editorial').textContent = '✓';
+  document.querySelector('.pipeline-tab[data-step="editorial"]').classList.add('done');
+  unlock_step('export');
+  await save_chapter();
+  switch_step('export');
+}
+
+// ── STEP 6: EXPORT ────────────────────────────────────────────────────────
+function populate_export_step() {
+  const final = activeChapter.data?.edResult || activeChapter.data?.scResult || '';
+  document.getElementById('export-preview').textContent = final || 'No approved draft found.';
+}
+
+async function export_docx() {
+  const content = activeChapter.data?.edResult || '';
+  const title = activeChapter.title;
+  const result = await ipcRenderer.invoke('export-docx', { content, title, language: 'en' });
+  const el = document.getElementById('export-status');
+  if (result.success) {
+    el.textContent = `✓ Saved to ${result.path}`;
+    activeChapter.stepsDone.push('export');
+    document.getElementById('ts-export').textContent = '✓';
+    await save_chapter();
+    render_chapter_list();
+  } else {
+    el.textContent = result.success === false ? 'Export cancelled.' : `Error: ${result.error}`;
+  }
+}
+
+async function export_afrikaans() {
+  document.getElementById('export-status').textContent = 'Translating to Afrikaans...';
+  const draft = activeChapter.data?.edResult || '';
+  const prompts = STEP_PROMPTS.afrikaans(draft);
+  const result = await ai('claude', prompts.claude, null, null);
+  const afText = result.error ? draft : result.text;
+
+  activeChapter.data.afrikaansDraft = afText;
+  await save_chapter();
+
+  const expResult = await ipcRenderer.invoke('export-docx', {
+    content: afText,
+    title: `${activeChapter.title} (Afrikaans)`,
+    language: 'af'
+  });
+  document.getElementById('export-status').textContent = expResult.success ? `✓ Afrikaans saved.` : 'Export cancelled.';
+}
+
+// ── MODALS ────────────────────────────────────────────────────────────────
+function show_modal(id) { document.getElementById(id).classList.add('open'); }
+function close_modal(id) { document.getElementById(id).classList.remove('open'); }
+function show_new_project_modal() { show_modal('modal-new-project'); }
+
+function show_settings() {
+  if (config?.keys) {
+    document.getElementById('s-key-claude').value = config.keys.claude || '';
+    document.getElementById('s-key-chatgpt').value = config.keys.chatgpt || '';
+    document.getElementById('s-key-perplexity').value = config.keys.perplexity || '';
+    document.getElementById('s-key-grok').value = config.keys.grok || '';
+  }
+  show_modal('modal-settings');
+}
+
+async function save_settings() {
+  config.keys = {
+    claude: document.getElementById('s-key-claude').value.trim(),
+    chatgpt: document.getElementById('s-key-chatgpt').value.trim(),
+    perplexity: document.getElementById('s-key-perplexity').value.trim(),
+    grok: document.getElementById('s-key-grok').value.trim()
+  };
+  await ipcRenderer.invoke('save-config', config);
+  close_modal('modal-settings');
+}
+
+async function create_project() {
+  const name = document.getElementById('np-name').value.trim();
+  if (!name) return;
+  const project = {
+    id: Date.now().toString(),
+    name,
+    genre: document.getElementById('np-genre').value,
+    language: document.getElementById('np-lang').value,
+    structure: document.getElementById('np-structure').value,
+    author: document.getElementById('np-author').value.trim() || config?.author || '',
+    chapters: [],
+    createdAt: new Date().toISOString()
+  };
+  await ipcRenderer.invoke('save-project', project);
+  await refresh_projects();
+  close_modal('modal-new-project');
+  open_project(project.id);
+}
+
+// Close modals on overlay click
+document.querySelectorAll('.modal-overlay').forEach(el => {
+  el.addEventListener('click', e => { if (e.target === el) el.classList.remove('open'); });
+});
+</script>
+</body>
+</html>
