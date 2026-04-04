@@ -419,11 +419,11 @@
 
         <!-- STEP: WRITE -->
         <div class="step-view" id="step-write">
-          <div class="step-header"><h3>Step 2 — Write</h3><p>Claude drafts the chapter from your approved brief. Edit directly before approving.</p></div>
+          <div class="step-header"><h3>Step 2 — Write</h3><p>Generate a draft from your brief, or paste your own writing. Edit directly before approving.</p></div>
           <div class="three-panel">
             <div class="panel"><div class="panel-header"><span>Approved Research Brief</span></div><div class="panel-body" id="write-brief-display"><div class="empty-state">Brief will appear here</div></div></div>
-            <div class="panel"><div class="panel-header"><span>Claude — Draft Chapter</span><span id="claude-status"></span></div><div class="panel-body"><textarea id="write-draft" placeholder="Draft will appear here. You can edit directly." style="width:100%;height:100%;min-height:400px;background:transparent;border:none;color:var(--text);font-family:var(--font-body);font-size:14px;line-height:1.8;resize:none;outline:none;"></textarea></div></div>
-            <div class="decision-bar"><span class="decision-label">Review the draft. Edit directly in the right panel. Approve when ready.</span><button class="btn-run" id="btn-run-write" onclick="run_write()">Generate Draft</button><button class="btn-approve" id="btn-approve-write" style="display:none" onclick="approve_write()">Approve Draft →</button></div>
+            <div class="panel"><div class="panel-header"><span>Draft Chapter</span><span id="claude-status"></span></div><div class="panel-body"><textarea id="write-draft" placeholder="Paste your own text here, or click Generate Draft to have AI write it." style="width:100%;height:100%;min-height:400px;background:transparent;border:none;color:var(--text);font-family:var(--font-body);font-size:14px;line-height:1.8;resize:none;outline:none;"></textarea></div></div>
+            <div class="decision-bar"><span class="decision-label">Paste your own chapter or generate one. Edit in the right panel. Approve when ready.</span><button class="btn-run" id="btn-run-write" onclick="run_write()">Generate Draft</button><button class="btn-secondary" id="btn-paste-write" onclick="paste_own_draft()" style="margin-left:8px;">I Have My Own Text</button><button class="btn-approve" id="btn-approve-write" style="display:none" onclick="approve_write()">Approve Draft →</button></div>
           </div>
         </div>
 
@@ -1176,6 +1176,21 @@ function approve_write() {
   activeChapter.step = 'factcheck'; activeChapter.stepsDone.push('write');
   document.getElementById('ts-write').textContent = '✓'; document.querySelector('.pipeline-tab[data-step="write"]').classList.add('done');
   unlock_step('factcheck'); save_chapter(); switch_step('factcheck');
+}
+
+function paste_own_draft() {
+  const el = document.getElementById('write-draft');
+  el.focus();
+  el.placeholder = 'Paste or type your chapter here, then click Approve Draft →';
+  document.getElementById('btn-approve-write').style.display = 'inline-flex';
+  document.getElementById('claude-status').textContent = '✍️ own';
+  // Listen for content so approve stays visible
+  el.addEventListener('input', function handler() {
+    if (el.value.trim()) {
+      activeChapter.data.writeDraft = el.value;
+      save_chapter();
+    }
+  });
 }
 
 // ── STEP 3: FACT-CHECK ──
