@@ -413,11 +413,11 @@
 
         <!-- STEP: RESEARCH -->
         <div class="step-view active" id="step-research">
-          <div class="step-header"><h3>Step 1 — Research</h3><p>Enter your topic. Perplexity finds sources. Grok verifies current facts. You approve the brief before writing begins.</p></div>
+          <div class="step-header"><h3>Step 1 — Research</h3><p>Enter your topic. AI finds sources and verifies current facts. You approve the brief before writing begins.</p></div>
           <div class="step-input-area"><label>Topic / Question for this chapter</label><input type="text" id="research-topic" placeholder="e.g. The Iran War — Week 5: March 29 – April 4, 2026"/></div>
           <div class="three-panel">
-            <div class="panel"><div class="panel-header"><span>Perplexity — Sources & Facts</span><span id="perp-status"></span></div><div class="panel-body" id="perp-result"><div class="empty-state">Run research to see results</div></div></div>
-            <div class="panel"><div class="panel-header"><span>Grok — Current Events</span><span id="grok-status"></span></div><div class="panel-body" id="grok-result"><div class="empty-state">Run research to see results</div></div></div>
+            <div class="panel"><div class="panel-header"><span>Sources & Facts</span><span id="perp-status"></span></div><div class="panel-body" id="perp-result"><div class="empty-state">Run research to see results</div></div></div>
+            <div class="panel"><div class="panel-header"><span>Current Events & Verification</span><span id="grok-status"></span></div><div class="panel-body" id="grok-result"><div class="empty-state">Run research to see results</div></div></div>
             <div class="decision-bar"><span class="decision-label">Review both panels, then edit the research brief below before approving.</span><button class="btn-run" id="btn-run-research" onclick="run_research()">Run Research</button><button class="btn-approve" id="btn-approve-research" style="display:none" onclick="approve_research()">Approve & Write →</button></div>
           </div>
           <div style="padding:16px 28px;border-top:1px solid var(--border);background:var(--surface2);"><div class="panel-header" style="padding:0;margin-bottom:10px;background:none;"><span>Research Brief — edit before approving</span></div><textarea id="research-brief" style="width:100%;min-height:120px;background:var(--surface);border:1px solid var(--border);color:var(--text);font-family:var(--font-body);font-size:14px;padding:14px;border-radius:6px;resize:vertical;outline:none;" placeholder="The AI summaries above will populate here automatically. You can edit before approving."></textarea></div>
@@ -435,10 +435,10 @@
 
         <!-- STEP: FACT-CHECK -->
         <div class="step-view" id="step-factcheck">
-          <div class="step-header"><h3>Step 3 — Fact-Check</h3><p>Grok checks every factual claim. You see the original, the verdicts, and apply only the changes you approve.</p></div>
+          <div class="step-header"><h3>Step 3 — Fact-Check</h3><p>AI checks every factual claim. You see the original, the verdicts, and apply only the changes you approve.</p></div>
           <div class="three-panel">
             <div class="panel"><div class="panel-header"><span>Original Draft</span></div><div class="panel-body" id="fc-original"><div class="empty-state">Original draft will appear here</div></div></div>
-            <div class="panel"><div class="panel-header"><span>Grok — Fact Verdicts</span><span id="grok-fc-status"></span></div><div class="panel-body" id="fc-verdicts"><div class="empty-state">Run fact-check to see verdicts</div></div></div>
+            <div class="panel"><div class="panel-header"><span>Fact Verdicts</span><span id="grok-fc-status"></span></div><div class="panel-body" id="fc-verdicts"><div class="empty-state">Run fact-check to see verdicts</div></div></div>
             <div class="decision-bar"><span class="decision-label">Review each verdict. The result panel below updates as you approve changes.</span><button class="btn-run" id="btn-run-fc" onclick="run_factcheck()">Run Fact-Check</button><button class="btn-approve" id="btn-approve-fc" style="display:none" onclick="approve_factcheck()">Approve & Continue →</button></div>
           </div>
           <div class="result-panel" id="fc-result-panel"><div class="panel-header"><span>✓ Result — Corrected Draft</span></div><div class="panel-body"><textarea id="fc-result-text" style="width:100%;height:100%;min-height:200px;background:transparent;border:none;color:var(--text);font-family:var(--font-body);font-size:14px;line-height:1.8;resize:none;outline:none;"></textarea></div></div>
@@ -446,10 +446,10 @@
 
         <!-- STEP: SOURCE CHECK -->
         <div class="step-view" id="step-sourcecheck">
-          <div class="step-header"><h3>Step 4 — Source Check</h3><p>Perplexity verifies every citation. You see the original sources, the verdicts, and approve the final list.</p></div>
+          <div class="step-header"><h3>Step 4 — Source Check</h3><p>AI verifies every citation. You see the original sources, the verdicts, and approve the final list.</p></div>
           <div class="three-panel">
             <div class="panel"><div class="panel-header"><span>Draft with Sources</span></div><div class="panel-body" id="sc-original"><div class="empty-state">Draft will appear here</div></div></div>
-            <div class="panel"><div class="panel-header"><span>Perplexity — Source Verdicts</span><span id="perp-sc-status"></span></div><div class="panel-body" id="sc-verdicts"><div class="empty-state">Run source check to see verdicts</div></div></div>
+            <div class="panel"><div class="panel-header"><span>Source Verdicts</span><span id="perp-sc-status"></span></div><div class="panel-body" id="sc-verdicts"><div class="empty-state">Run source check to see verdicts</div></div></div>
             <div class="decision-bar"><span class="decision-label">Review source verdicts. Edit result below as needed.</span><button class="btn-run" id="btn-run-sc" onclick="run_sourcecheck()">Run Source Check</button><button class="btn-approve" id="btn-approve-sc" style="display:none" onclick="approve_sourcecheck()">Approve & Continue →</button></div>
           </div>
           <div class="result-panel" id="sc-result-panel"><div class="panel-header"><span>✓ Result — Verified Draft</span></div><div class="panel-body"><textarea id="sc-result-text" style="width:100%;height:100%;min-height:200px;background:transparent;border:none;color:var(--text);font-family:var(--font-body);font-size:14px;line-height:1.8;resize:none;outline:none;"></textarea></div></div>
@@ -457,10 +457,10 @@
 
         <!-- STEP: EDITORIAL -->
         <div class="step-view" id="step-editorial">
-          <div class="step-header"><h3>Step 5 — Editorial Review</h3><p>ChatGPT reads the full chapter as a fresh editor. You see its notes, then decide what to apply.</p></div>
+          <div class="step-header"><h3>Step 5 — Editorial Review</h3><p>AI reads the full chapter as a fresh editor. You see its notes, then decide what to apply.</p></div>
           <div class="three-panel">
             <div class="panel"><div class="panel-header"><span>Current Draft</span></div><div class="panel-body" id="ed-original"><div class="empty-state">Draft will appear here</div></div></div>
-            <div class="panel"><div class="panel-header"><span>ChatGPT — Editorial Notes</span><span id="chatgpt-status"></span></div><div class="panel-body" id="ed-notes"><div class="empty-state">Run editorial review to see notes</div></div></div>
+            <div class="panel"><div class="panel-header"><span>Editorial Notes</span><span id="chatgpt-status"></span></div><div class="panel-body" id="ed-notes"><div class="empty-state">Run editorial review to see notes</div></div></div>
             <div class="decision-bar"><span class="decision-label">Apply editorial changes in the result panel below. Final draft is yours.</span><button class="btn-run" id="btn-run-ed" onclick="run_editorial()">Run Editorial</button><button class="btn-approve" id="btn-approve-ed" style="display:none" onclick="approve_editorial()">Approve Final Draft →</button></div>
           </div>
           <div class="result-panel" id="ed-result-panel"><div class="panel-header"><span>✓ Final Approved Draft — edit here</span></div><div class="panel-body"><textarea id="ed-result-text" style="width:100%;height:100%;min-height:200px;background:transparent;border:none;color:var(--text);font-family:var(--font-body);font-size:14px;line-height:1.8;resize:none;outline:none;"></textarea></div></div>
@@ -1157,7 +1157,7 @@ async function run_research() {
   set_panel('perp-result', perpText); set_panel('grok-result', grokText);
   document.getElementById('perp-status').textContent = perpRes.error ? '✗' : '✓';
   document.getElementById('grok-status').textContent = grokRes.error ? '✗' : '✓';
-  document.getElementById('research-brief').value = `PERPLEXITY FINDINGS:\n${perpText}\n\n---\n\nGROK FINDINGS:\n${grokText}`;
+  document.getElementById('research-brief').value = `SOURCE RESEARCH:\n${perpText}\n\n---\n\nFACT VERIFICATION:\n${grokText}`;
   activeChapter.data.researchTopic = topic; activeChapter.data.perpResult = perpText; activeChapter.data.grokResult = grokText;
   activeChapter.data.researchBrief = document.getElementById('research-brief').value;
   save_chapter();
