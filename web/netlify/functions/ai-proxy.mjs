@@ -61,7 +61,7 @@ export default async (req, context) => {
       url = 'https://api.perplexity.ai/chat/completions';
       headers = { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` };
       body = JSON.stringify({
-        model: 'llama-3.1-sonar-large-128k-online',
+        model: 'sonar-pro',
         messages: [
           { role: 'system', content: systemPrompt || 'You are a research assistant.' },
           { role: 'user', content: prompt }

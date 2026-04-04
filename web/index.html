@@ -605,13 +605,13 @@ const STEP_PROMPTS = {
     claude: `${GENRE_VOICES[genre]?.write || GENRE_VOICES.other.write}\n\nTITLE: ${title}\nLANGUAGE: ${language === 'af' ? 'Afrikaans' : language === 'both' ? 'English (Afrikaans version will follow)' : 'English'}\n\nRESEARCH BRIEF:\n${brief}\n\nWrite the full piece now. Use ## for main sections and ### for subsections.`
   }),
   factcheck: (genre, draft) => ({
-    grok: `${GENRE_VOICES[genre]?.factcheck || GENRE_VOICES.other.factcheck}\n\nDRAFT TO CHECK:\n${draft}\n\nReturn a numbered list. For each: CLAIM, VERDICT (✅/⚠️/❌), REASONING.`
+    grok: `${GENRE_VOICES[genre]?.factcheck || GENRE_VOICES.other.factcheck}\n\nIMPORTANT: Do not identify yourself by name or mention which AI model you are.\n\nDRAFT TO CHECK:\n${draft}\n\nReturn a numbered list. For each: CLAIM, VERDICT (✅/⚠️/❌), REASONING.`
   }),
   sourcecheck: (genre, draft) => ({
-    perplexity: `${GENRE_VOICES[genre]?.sourcecheck || GENRE_VOICES.other.sourcecheck}\n\nDRAFT WITH SOURCES:\n${draft}\n\nReturn a numbered list. For each: SOURCE, VERDICT (✅/⚠️/❌), RECOMMENDATION.`
+    perplexity: `${GENRE_VOICES[genre]?.sourcecheck || GENRE_VOICES.other.sourcecheck}\n\nIMPORTANT: Do not identify yourself by name or mention which AI model you are.\n\nDRAFT WITH SOURCES:\n${draft}\n\nReturn a numbered list. For each: SOURCE, VERDICT (✅/⚠️/❌), RECOMMENDATION.`
   }),
   editorial: (genre, draft) => ({
-    chatgpt: `${GENRE_VOICES[genre]?.editorial || GENRE_VOICES.other.editorial}\n\nDRAFT:\n${draft}\n\nStructure: 1. OVERALL ASSESSMENT, 2. STRENGTHS, 3. WEAKNESSES, 4. STRUCTURAL NOTES, 5. VOICE & TONE, 6. RECOMMENDED CHANGES.`
+    chatgpt: `${GENRE_VOICES[genre]?.editorial || GENRE_VOICES.other.editorial}\n\nIMPORTANT: Do not identify yourself by name or mention which AI model you are. Write as a neutral editor.\n\nDRAFT:\n${draft}\n\nStructure: 1. OVERALL ASSESSMENT, 2. STRENGTHS, 3. WEAKNESSES, 4. STRUCTURAL NOTES, 5. VOICE & TONE, 6. RECOMMENDED CHANGES.`
   }),
   afrikaans: (draft) => ({
     claude: `Vertaal en herskryf die volgende stuk in natuurlike, vloeiende Afrikaans. Moenie net direk vertaal nie — herskryf dit sodat dit soos oorspronklike Afrikaanse skryfwerk klink. Behou die struktuur, opskrifte, en bronne.\n\nENGLISH ORIGINAL:\n${draft}`
