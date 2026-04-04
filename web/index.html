@@ -284,16 +284,25 @@
       <button class="btn-primary" onclick="ob_next(1)">Continue →</button>
     </div>
 
-    <!-- Step 2: First project name -->
+    <!-- Step 2: Recovery email -->
     <div class="ob-step" id="ob-step-2">
+      <h2>Recovery email</h2>
+      <div class="sub">Your Author ID key will be encrypted and sent here for safekeeping. You can recover your identity from any device.</div>
+      <input type="text" id="ob-email" placeholder="your@email.com"/>
+      <div id="email-error" style="color:var(--notfound); font-size:13px; margin:-8px 0 12px; display:none;">Please enter a valid email address.</div>
+      <button class="btn-primary" onclick="ob_validate_email()">Continue →</button>
+    </div>
+
+    <!-- Step 3: First project name -->
+    <div class="ob-step" id="ob-step-3">
       <h2>Name your first project</h2>
       <div class="sub">You can create more projects later.</div>
       <input type="text" id="ob-project-name" placeholder="e.g. The Hour of Fury"/>
-      <button class="btn-primary" onclick="ob_next(2)">Continue →</button>
+      <button class="btn-primary" onclick="ob_next(3)">Continue →</button>
     </div>
 
-    <!-- Step 3: Genre -->
-    <div class="ob-step" id="ob-step-3">
+    <!-- Step 4: Genre -->
+    <div class="ob-step" id="ob-step-4">
       <h2>What kind of writing is this?</h2>
       <div class="sub">This shapes how every AI in the pipeline responds.</div>
       <div class="option-grid">
@@ -301,12 +310,21 @@
         <button class="option-btn" data-val="theology" onclick="ob_select(this,'ob-genre')">✝️ Theology</button>
         <button class="option-btn" data-val="fiction" onclick="ob_select(this,'ob-genre')">📖 Fiction</button>
         <button class="option-btn" data-val="journalism" onclick="ob_select(this,'ob-genre')">🗞️ Journalism</button>
+        <button class="option-btn" data-val="academic" onclick="ob_select(this,'ob-genre')">🎓 Academic / Scholarly</button>
+        <button class="option-btn" data-val="science" onclick="ob_select(this,'ob-genre')">🔬 Science & Research</button>
+        <button class="option-btn" data-val="business" onclick="ob_select(this,'ob-genre')">📊 Business & Finance</button>
+        <button class="option-btn" data-val="arts" onclick="ob_select(this,'ob-genre')">🎭 Arts & Humanities</button>
       </div>
-      <button class="btn-primary" onclick="ob_next(3)">Continue →</button>
+      <div id="ob-discipline-area" style="display:none; margin-top:12px;">
+        <div class="key-label">Discipline</div>
+        <select id="ob-discipline" onchange="ob_discipline_change()" style="margin-bottom:10px;"></select>
+        <input type="text" id="ob-discipline-custom" placeholder="Or type your own discipline..." style="display:none;" oninput="ob_custom_discipline()"/>
+      </div>
+      <button class="btn-primary" onclick="ob_next(4)">Continue →</button>
     </div>
 
-    <!-- Step 4: Language -->
-    <div class="ob-step" id="ob-step-4">
+    <!-- Step 5: Language -->
+    <div class="ob-step" id="ob-step-5">
       <h2>Publishing language</h2>
       <div class="sub">All exports will be in your chosen language.</div>
       <div class="option-grid">
@@ -315,11 +333,11 @@
         <button class="option-btn" data-val="both" onclick="ob_select(this,'ob-lang')">Both (EN + AF)</button>
         <button class="option-btn" data-val="other" onclick="ob_select(this,'ob-lang')">Other</button>
       </div>
-      <button class="btn-primary" onclick="ob_next(4)">Continue →</button>
+      <button class="btn-primary" onclick="ob_next(5)">Continue →</button>
     </div>
 
-    <!-- Step 5: Structure -->
-    <div class="ob-step" id="ob-step-5">
+    <!-- Step 6: Structure -->
+    <div class="ob-step" id="ob-step-6">
       <h2>How is this work structured?</h2>
       <div class="sub">This determines how each chapter or piece is organised.</div>
       <div class="option-grid">
@@ -462,8 +480,15 @@
   <div class="modal">
     <button class="close-btn" onclick="close_modal('modal-settings')">×</button>
     <h2>Settings</h2>
+    <div id="s-author-id-block" style="margin-bottom:18px;padding:14px 16px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;">
+      <div class="key-label">Author ID</div>
+      <div id="s-author-id" style="font-family:var(--font-mono);font-size:14px;color:var(--accent);letter-spacing:1px;margin-top:4px;">—</div>
+    </div>
     <div class="key-label">Author Name</div><input type="text" id="s-author"/>
+    <div class="key-label" style="margin-top:12px;">Recovery Email</div><input type="text" id="s-email"/>
     <button class="btn-primary" style="margin-top:16px;" onclick="save_settings()">Save Settings</button>
+    <button class="btn-secondary" style="margin-top:10px;width:100;text-align:center;" onclick="resend_escrow()">Resend Recovery Email</button>
+    <div id="escrow-status" style="font-family:var(--font-mono);font-size:11px;color:var(--text3);margin-top:8px;text-align:center;"></div>
   </div>
 </div>
 
@@ -472,7 +497,8 @@
     <button class="close-btn" onclick="close_modal('modal-new-project')">×</button>
     <h2>New Project</h2>
     <div class="np-label">Project Name</div><input type="text" id="np-name" placeholder="e.g. The Prophets and the Bombs"/>
-    <div class="np-label">Genre</div><select id="np-genre"><option value="history">History</option><option value="theology">Theology</option><option value="fiction">Fiction</option><option value="journalism">Journalism</option><option value="other">Other</option></select>
+    <div class="np-label">Genre</div><select id="np-genre" onchange="np_genre_change()"><option value="history">History</option><option value="theology">Theology</option><option value="fiction">Fiction</option><option value="journalism">Journalism</option><option value="academic">Academic / Scholarly</option><option value="science">Science & Research</option><option value="business">Business & Finance</option><option value="arts">Arts & Humanities</option><option value="other">Other</option></select>
+    <div id="np-discipline-area" style="display:none;"><div class="np-label">Discipline</div><select id="np-discipline" onchange="np_discipline_change()"></select><input type="text" id="np-discipline-custom" placeholder="Or type your own discipline..." style="display:none;margin-top:8px;"/></div>
     <div class="np-label">Language</div><select id="np-lang"><option value="en">English only</option><option value="af">Afrikaans only</option><option value="both">English + Afrikaans</option></select>
     <div class="np-label">Structure</div><select id="np-structure"><option value="weekly">Weekly chapters</option><option value="chapters">Book chapters</option><option value="standalone">Standalone pieces</option><option value="episodes">Episodes / stories</option></select>
     <div class="np-label">Author</div><input type="text" id="np-author"/>
@@ -490,6 +516,16 @@
 </div>
 
 <script>
+// ═══════════════════════════════════════════════════════════════════════════
+// GENRE DISCIPLINES MAP
+// ═══════════════════════════════════════════════════════════════════════════
+const GENRE_DISCIPLINES = {
+  academic: ['Philosophy', 'Sociology', 'Psychology', 'Political Science', 'Law', 'Education', 'Linguistics', 'Anthropology', 'Custom...'],
+  science: ['Biology', 'Chemistry', 'Physics', 'Medicine', 'Environmental Science', 'Computer Science', 'Mathematics', 'Engineering', 'Custom...'],
+  business: ['Economics', 'Management', 'Marketing', 'Accounting', 'Entrepreneurship', 'Public Policy', 'Custom...'],
+  arts: ['Literature', 'Visual Arts', 'Music', 'Film Studies', 'Theatre', 'Cultural Studies', 'Religious Studies', 'Custom...']
+};
+
 // ═══════════════════════════════════════════════════════════════════════════
 // PIPELINE PROMPTS (inlined from pipeline.js)
 // ═══════════════════════════════════════════════════════════════════════════
@@ -517,6 +553,30 @@ const GENRE_VOICES = {
     factcheck: `You are a rigorous fact-checker for journalism. Verify every factual claim. Flag anything unverifiable. Return structured verdicts.`,
     sourcecheck: `You are a journalism source verifier. Assess credibility, primary vs secondary, and verifiability. Return structured verdicts.`,
     editorial: `You are a senior journalism editor. Evaluate news value, clarity, structure, sourcing quality. Be specific and constructive.`
+  },
+  academic: {
+    write: `You are a distinguished academic writer. Write with rigour, precision, and intellectual depth. Use formal structure: abstract, argument, evidence, conclusion. Cite sources inline.`,
+    factcheck: `You are a peer reviewer. Verify every claim, statistic, and reference with academic precision. Return structured verdicts.`,
+    sourcecheck: `You are an academic librarian verifying citations. Check DOIs, author names, publication dates, and journal names. Return structured verdicts.`,
+    editorial: `You are a senior academic editor. Evaluate argument structure, evidentiary support, methodological clarity, and scholarly contribution. Be specific.`
+  },
+  science: {
+    write: `You are a science writer combining rigour with clarity. Present hypotheses, methods, results, and implications. Make complex ideas accessible without losing precision.`,
+    factcheck: `You are a scientific fact-checker. Verify every data point, methodology reference, and conclusion. Return structured verdicts.`,
+    sourcecheck: `You are a research librarian. Verify every journal citation, preprint, dataset reference, and author attribution. Return structured verdicts.`,
+    editorial: `You are a senior science editor. Evaluate scientific accuracy, logical flow, data presentation, and readability. Be specific.`
+  },
+  business: {
+    write: `You are a business writer with expertise in finance, strategy, and markets. Write with authority, data-driven precision, and clear actionable insights.`,
+    factcheck: `You are a business fact-checker. Verify market data, financial claims, company details, and regulatory references. Return structured verdicts.`,
+    sourcecheck: `You are a business research verifier. Check company reports, market data sources, and regulatory filings for accuracy. Return structured verdicts.`,
+    editorial: `You are a senior business editor. Evaluate strategic logic, data accuracy, market relevance, and executive readability. Be specific.`
+  },
+  arts: {
+    write: `You are a humanities writer with deep cultural knowledge. Write with sensitivity, nuance, and interpretive depth. Balance analysis with evocative prose.`,
+    factcheck: `You are a humanities fact-checker. Verify historical references, attribution of works, biographical details, and cultural claims. Return structured verdicts.`,
+    sourcecheck: `You are an arts and humanities librarian. Verify citations of artworks, performances, critical texts, and archival sources. Return structured verdicts.`,
+    editorial: `You are a senior humanities editor. Evaluate interpretive coherence, cultural sensitivity, prose quality, and scholarly depth. Be specific.`
   },
   other: {
     write: `You are a skilled writer. Serve the work with clarity, precision, and authentic voice.`,
@@ -581,6 +641,117 @@ const DB = {
 };
 
 // ═══════════════════════════════════════════════════════════════════════════
+// AUTHOR KEY SYSTEM (256-bit, Web Crypto, never exposed to UI)
+// ═══════════════════════════════════════════════════════════════════════════
+const AuthorKey = {
+  async generate(authorName, email) {
+    const rawKey = crypto.getRandomValues(new Uint8Array(32));
+    const keyHex = Array.from(rawKey).map(b => b.toString(16).padStart(2, '0')).join('');
+    const nameSlug = authorName.trim().split(/\s+/).pop().toUpperCase().replace(/[^A-Z]/g, '').slice(0, 6) || 'AUTHOR';
+    const hashBuf = await crypto.subtle.digest('SHA-256', rawKey);
+    const hashArr = Array.from(new Uint8Array(hashBuf));
+    const hashShort = hashArr.slice(0, 2).map(b => b.toString(16).padStart(2, '0')).join('').toUpperCase().slice(0, 4);
+    const authorId = `SCRPT-${nameSlug}-${hashShort}`;
+    const keyHash = hashArr.map(b => b.toString(16).padStart(2, '0')).join('');
+    const encrypted = await this._encrypt(keyHex, email);
+    localStorage.setItem('scriptorium_author_key_enc', encrypted);
+    localStorage.setItem('scriptorium_author_id', authorId);
+    localStorage.setItem('scriptorium_key_hash', keyHash);
+    return { authorId, keyHash, encrypted };
+  },
+
+  getAuthorId() {
+    return localStorage.getItem('scriptorium_author_id') || null;
+  },
+
+  getKeyHash() {
+    return localStorage.getItem('scriptorium_key_hash') || null;
+  },
+
+  exists() {
+    return !!localStorage.getItem('scriptorium_author_id');
+  },
+
+  async _encrypt(plaintext, passphrase) {
+    const enc = new TextEncoder();
+    const salt = crypto.getRandomValues(new Uint8Array(16));
+    const keyMaterial = await crypto.subtle.importKey('raw', enc.encode(passphrase), 'PBKDF2', false, ['deriveKey']);
+    const key = await crypto.subtle.deriveKey({ name: 'PBKDF2', salt, iterations: 100000, hash: 'SHA-256' }, keyMaterial, { name: 'AES-GCM', length: 256 }, false, ['encrypt']);
+    const iv = crypto.getRandomValues(new Uint8Array(12));
+    const ciphertext = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, enc.encode(plaintext));
+    const combined = new Uint8Array(salt.length + iv.length + new Uint8Array(ciphertext).length);
+    combined.set(salt, 0);
+    combined.set(iv, salt.length);
+    combined.set(new Uint8Array(ciphertext), salt.length + iv.length);
+    return btoa(String.fromCharCode(...combined));
+  },
+
+  getEncryptedPayload() {
+    return localStorage.getItem('scriptorium_author_key_enc') || null;
+  }
+};
+
+// ═══════════════════════════════════════════════════════════════════════════
+// WORK SIGNATURE
+// ═══════════════════════════════════════════════════════════════════════════
+async function generateWorkSignature(title, genres, disciplines) {
+  const authorId = AuthorKey.getAuthorId() || 'UNKNOWN';
+  const keyHash = AuthorKey.getKeyHash() || '';
+  const exportedAt = new Date().toISOString();
+  const sigPayload = `${authorId}|${keyHash}|${title}|${genres}|${disciplines}|${exportedAt}`;
+  const enc = new TextEncoder();
+  const hashBuf = await crypto.subtle.digest('SHA-256', enc.encode(sigPayload));
+  const signatureHash = Array.from(new Uint8Array(hashBuf)).map(b => b.toString(16).padStart(2, '0')).join('');
+  return { authorId, keyHash: keyHash.slice(0, 16) + '...', title, genres, disciplines, exportedAt, signatureHash };
+}
+
+function formatSignatureHeader(sig) {
+  return `══════════════════════════════════════════════════════════
+  SCRIPTORIUM — WORK SIGNATURE
+══════════════════════════════════════════════════════════
+  Author ID:      ${sig.authorId}
+  Key Hash:       ${sig.keyHash}
+  Title:          ${sig.title}
+  Genre:          ${sig.genres}
+  Disciplines:    ${sig.disciplines || '—'}
+  Exported:       ${sig.exportedAt}
+  Signature:      ${sig.signatureHash}
+══════════════════════════════════════════════════════════
+
+`;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// VAULT (IndexedDB — silent local export log)
+// ═══════════════════════════════════════════════════════════════════════════
+const Vault = {
+  _db: null,
+  async open() {
+    if (this._db) return this._db;
+    return new Promise((resolve, reject) => {
+      const req = indexedDB.open('scriptorium_vault', 1);
+      req.onupgradeneeded = e => {
+        const db = e.target.result;
+        if (!db.objectStoreNames.contains('exports')) {
+          const store = db.createObjectStore('exports', { keyPath: 'id', autoIncrement: true });
+          store.createIndex('authorId', 'authorId', { unique: false });
+          store.createIndex('exportedAt', 'exportedAt', { unique: false });
+        }
+      };
+      req.onsuccess = e => { this._db = e.target.result; resolve(this._db); };
+      req.onerror = e => reject(e.target.error);
+    });
+  },
+  async log(entry) {
+    try {
+      const db = await this.open();
+      const tx = db.transaction('exports', 'readwrite');
+      tx.objectStore('exports').add(entry);
+    } catch (e) { /* silent */ }
+  }
+};
+
+// ═══════════════════════════════════════════════════════════════════════════
 // AI CALL (via Netlify Function proxy)
 // ═══════════════════════════════════════════════════════════════════════════
 async function aiCall(provider, prompt, systemPrompt) {
@@ -616,6 +787,7 @@ window.onload = () => {
     show_screen('screen-onboarding');
     render_ob_progress(0);
   }
+  Vault.open();
 };
 
 function show_screen(id) {
@@ -630,8 +802,8 @@ function toggleSidebar() {
 }
 
 // ── ONBOARDING ──
-const OB_STEPS = 6;
-let ob_genre = '', ob_lang = '', ob_structure = '';
+const OB_STEPS = 7;
+let ob_genre = '', ob_lang = '', ob_structure = '', ob_discipline = '';
 
 const VALID_PASSKEYS = [
   'SCRP-2026-ALPHA-7K9M',
@@ -653,6 +825,18 @@ function ob_validate_passkey() {
   }
 }
 
+function ob_validate_email() {
+  const email = document.getElementById('ob-email').value.trim();
+  const errEl = document.getElementById('email-error');
+  if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    errEl.style.display = 'none';
+    window._recoveryEmail = email;
+    ob_next(2);
+  } else {
+    errEl.style.display = 'block';
+  }
+}
+
 function render_ob_progress(current) {
   document.getElementById('ob-progress').innerHTML = Array.from({length: OB_STEPS}, (_, i) =>
     `<div class="ob-dot ${i < current ? 'done' : i === current ? 'active' : ''}"></div>`
@@ -662,9 +846,53 @@ function render_ob_progress(current) {
 function ob_select(btn, key) {
   btn.closest('.ob-step').querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
   btn.classList.add('selected');
-  if (key === 'ob-genre') ob_genre = btn.dataset.val;
+  if (key === 'ob-genre') {
+    ob_genre = btn.dataset.val;
+    ob_discipline = '';
+    show_discipline_dropdown('ob', btn.dataset.val);
+  }
   if (key === 'ob-lang') ob_lang = btn.dataset.val;
   if (key === 'ob-structure') ob_structure = btn.dataset.val;
+}
+
+function show_discipline_dropdown(prefix, genre) {
+  const area = document.getElementById(`${prefix}-discipline-area`);
+  const sel = document.getElementById(`${prefix}-discipline`);
+  const custom = document.getElementById(`${prefix}-discipline-custom`);
+  if (GENRE_DISCIPLINES[genre]) {
+    area.style.display = 'block';
+    sel.innerHTML = '<option value="">Select discipline...</option>' +
+      GENRE_DISCIPLINES[genre].map(d => `<option value="${d}">${d}</option>`).join('');
+    custom.style.display = 'none';
+    custom.value = '';
+  } else {
+    area.style.display = 'none';
+    sel.innerHTML = '';
+    custom.style.display = 'none';
+    custom.value = '';
+  }
+}
+
+function ob_discipline_change() {
+  const val = document.getElementById('ob-discipline').value;
+  const custom = document.getElementById('ob-discipline-custom');
+  if (val === 'Custom...') { custom.style.display = 'block'; ob_discipline = ''; }
+  else { custom.style.display = 'none'; custom.value = ''; ob_discipline = val; }
+}
+
+function ob_custom_discipline() {
+  ob_discipline = document.getElementById('ob-discipline-custom').value.trim();
+}
+
+function np_genre_change() {
+  show_discipline_dropdown('np', document.getElementById('np-genre').value);
+}
+
+function np_discipline_change() {
+  const val = document.getElementById('np-discipline').value;
+  const custom = document.getElementById('np-discipline-custom');
+  if (val === 'Custom...') { custom.style.display = 'block'; }
+  else { custom.style.display = 'none'; custom.value = ''; }
 }
 
 function ob_next(step) {
@@ -673,17 +901,28 @@ function ob_next(step) {
   render_ob_progress(step+1);
 }
 
-function ob_finish() {
+async function ob_finish() {
   const author = document.getElementById('ob-author').value.trim();
   const projectName = document.getElementById('ob-project-name').value.trim();
+  const email = window._recoveryEmail || '';
 
-  config = { author, passkey: window._validPasskey };
+  // Generate author key if not yet created
+  if (!AuthorKey.exists()) {
+    try {
+      const result = await AuthorKey.generate(author, email);
+      // Send escrow email silently
+      send_escrow_email(email, result.authorId, result.encrypted);
+    } catch (e) { /* proceed even if key gen fails */ }
+  }
+
+  config = { author, passkey: window._validPasskey, email, authorId: AuthorKey.getAuthorId() };
   DB.saveConfig(config);
 
   const project = {
     id: Date.now().toString(),
     name: projectName || 'My First Project',
     genre: ob_genre || 'history',
+    discipline: ob_discipline || '',
     language: ob_lang || 'en',
     structure: ob_structure || 'chapters',
     author,
@@ -695,6 +934,36 @@ function ob_finish() {
   show_screen('screen-app');
   refresh_projects();
   open_project(project.id);
+}
+
+async function send_escrow_email(email, authorId, encryptedPayload) {
+  if (!email) return;
+  try {
+    await fetch('/.netlify/functions/escrow-email', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, authorId, encryptedPayload })
+    });
+  } catch (e) { /* silent — user can resend from settings */ }
+}
+
+async function resend_escrow() {
+  const email = document.getElementById('s-email').value.trim() || config?.email;
+  const statusEl = document.getElementById('escrow-status');
+  if (!email) { statusEl.textContent = 'No email address set.'; return; }
+  const authorId = AuthorKey.getAuthorId();
+  const encrypted = AuthorKey.getEncryptedPayload();
+  if (!authorId || !encrypted) { statusEl.textContent = 'No author key found.'; return; }
+  statusEl.textContent = 'Sending...';
+  try {
+    const res = await fetch('/.netlify/functions/escrow-email', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, authorId, encryptedPayload: encrypted })
+    });
+    if (res.ok) statusEl.textContent = '✓ Recovery email sent.';
+    else statusEl.textContent = '✗ Failed to send. Try again.';
+  } catch (e) { statusEl.textContent = '✗ Network error.'; }
 }
 
 // ── PROJECTS ──
@@ -718,7 +987,8 @@ function open_project(id) {
   activeProject = DB.loadProject(id);
   activeChapter = null;
   document.getElementById('pv-title').textContent = activeProject.name;
-  document.getElementById('pv-meta').textContent = `${activeProject.genre.toUpperCase()} · ${activeProject.language.toUpperCase()} · ${activeProject.structure}`;
+  const disc = activeProject.discipline ? ` · ${activeProject.discipline}` : '';
+  document.getElementById('pv-meta').textContent = `${activeProject.genre.toUpperCase()}${disc} · ${activeProject.language.toUpperCase()} · ${activeProject.structure}`;
   document.getElementById('view-welcome').style.display = 'none';
   document.getElementById('view-project').style.display = 'flex';
   document.getElementById('pv-chapter-list').style.display = 'flex';
@@ -965,29 +1235,41 @@ function approve_editorial() {
   unlock_step('export'); save_chapter(); switch_step('export');
 }
 
-// ── STEP 6: EXPORT ──
+// ── STEP 6: EXPORT (with WorkSignature + Vault logging) ──
 function populate_export_step() {
   const final = activeChapter.data?.edResult || activeChapter.data?.scResult || '';
   document.getElementById('export-preview').textContent = final || 'No approved draft found.';
 }
 
-function export_txt() {
+async function export_txt() {
   const content = activeChapter.data?.edResult || '';
   const title = activeChapter.title;
-  const blob = new Blob([content], { type: 'text/plain' });
+  const genre = activeProject.genre;
+  const discipline = activeProject.discipline || '';
+  const sig = await generateWorkSignature(title, genre, discipline);
+  const header = formatSignatureHeader(sig);
+  const blob = new Blob([header + content], { type: 'text/plain' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url; a.download = `${title.replace(/[^a-z0-9]/gi, '_')}.txt`;
   document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
   document.getElementById('export-status').textContent = '✓ Downloaded';
   activeChapter.stepsDone.push('export'); document.getElementById('ts-export').textContent = '✓'; save_chapter();
+  // Vault log
+  Vault.log({ authorId: sig.authorId, title, genre, disciplines: discipline, exportedAt: sig.exportedAt, signatureHash: sig.signatureHash });
 }
 
-function copy_export() {
+async function copy_export() {
   const content = activeChapter.data?.edResult || '';
-  navigator.clipboard.writeText(content).then(() => {
+  const title = activeChapter.title;
+  const genre = activeProject.genre;
+  const discipline = activeProject.discipline || '';
+  const sig = await generateWorkSignature(title, genre, discipline);
+  const header = formatSignatureHeader(sig);
+  navigator.clipboard.writeText(header + content).then(() => {
     document.getElementById('export-status').textContent = '✓ Copied to clipboard';
   });
+  Vault.log({ authorId: sig.authorId, title, genre, disciplines: discipline, exportedAt: sig.exportedAt, signatureHash: sig.signatureHash });
 }
 
 async function export_afrikaans() {
@@ -997,12 +1279,18 @@ async function export_afrikaans() {
   const result = await ai('claude', prompts.claude, null, null);
   const afText = result.error ? draft : result.text;
   activeChapter.data.afrikaansDraft = afText; save_chapter();
-  const blob = new Blob([afText], { type: 'text/plain' });
+  const title = activeChapter.title;
+  const genre = activeProject.genre;
+  const discipline = activeProject.discipline || '';
+  const sig = await generateWorkSignature(title + ' (Afrikaans)', genre, discipline);
+  const header = formatSignatureHeader(sig);
+  const blob = new Blob([header + afText], { type: 'text/plain' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
-  a.href = url; a.download = `${activeChapter.title.replace(/[^a-z0-9]/gi, '_')}_AF.txt`;
+  a.href = url; a.download = `${title.replace(/[^a-z0-9]/gi, '_')}_AF.txt`;
   document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
   document.getElementById('export-status').textContent = '✓ Afrikaans version downloaded';
+  Vault.log({ authorId: sig.authorId, title: title + ' (Afrikaans)', genre, disciplines: discipline, exportedAt: sig.exportedAt, signatureHash: sig.signatureHash });
 }
 
 // ── MODALS ──
@@ -1012,11 +1300,15 @@ function show_new_project_modal() { show_modal('modal-new-project'); }
 
 function show_settings() {
   document.getElementById('s-author').value = config?.author || '';
+  document.getElementById('s-email').value = config?.email || '';
+  document.getElementById('s-author-id').textContent = AuthorKey.getAuthorId() || '—';
+  document.getElementById('escrow-status').textContent = '';
   show_modal('modal-settings');
 }
 
 function save_settings() {
   config.author = document.getElementById('s-author').value.trim();
+  config.email = document.getElementById('s-email').value.trim();
   DB.saveConfig(config);
   close_modal('modal-settings');
 }
@@ -1024,9 +1316,15 @@ function save_settings() {
 function create_project() {
   const name = document.getElementById('np-name').value.trim();
   if (!name) return;
+  const discSel = document.getElementById('np-discipline');
+  const discCustom = document.getElementById('np-discipline-custom');
+  let discipline = '';
+  if (discSel && discSel.value && discSel.value !== 'Custom...') discipline = discSel.value;
+  else if (discCustom && discCustom.value.trim()) discipline = discCustom.value.trim();
   const project = {
     id: Date.now().toString(), name,
     genre: document.getElementById('np-genre').value,
+    discipline,
     language: document.getElementById('np-lang').value,
     structure: document.getElementById('np-structure').value,
     author: document.getElementById('np-author').value.trim() || config?.author || '',
