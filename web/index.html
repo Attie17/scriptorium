@@ -250,6 +250,7 @@
     .pipeline-tab { padding: 12px 10px; font-size: 9px; letter-spacing: 1px; }
     .step-header { padding: 14px 16px 10px; }
     .three-panel { grid-template-columns: 1fr; }
+    #step-review > div:nth-child(2) { grid-template-columns: 1fr !important; }
     .panel { border-right: none; border-bottom: 1px solid var(--border); }
     .decision-bar { padding: 12px 16px; }
     .step-input-area { padding: 14px 16px; }
@@ -407,10 +408,9 @@
         <div class="pipeline-tabs">
           <div class="pipeline-tab active" data-step="research" onclick="switch_step('research')"><span class="tab-status" id="ts-research">○</span> 1. Research</div>
           <div class="pipeline-tab locked" data-step="write" onclick="switch_step('write')"><span class="tab-status" id="ts-write">○</span> 2. Write</div>
-          <div class="pipeline-tab locked" data-step="factcheck" onclick="switch_step('factcheck')"><span class="tab-status" id="ts-factcheck">○</span> 3. Fact-Check</div>
-          <div class="pipeline-tab locked" data-step="sourcecheck" onclick="switch_step('sourcecheck')"><span class="tab-status" id="ts-sourcecheck">○</span> 4. Sources</div>
-          <div class="pipeline-tab locked" data-step="editorial" onclick="switch_step('editorial')"><span class="tab-status" id="ts-editorial">○</span> 5. Editorial</div>
-          <div class="pipeline-tab locked" data-step="export" onclick="switch_step('export')"><span class="tab-status" id="ts-export">○</span> 6. Export</div>
+          <div class="pipeline-tab locked" data-step="review" onclick="switch_step('review')"><span class="tab-status" id="ts-review">○</span> 3. Review</div>
+          <div class="pipeline-tab locked" data-step="editorial" onclick="switch_step('editorial')"><span class="tab-status" id="ts-editorial">○</span> 4. Editorial</div>
+          <div class="pipeline-tab locked" data-step="export" onclick="switch_step('export')"><span class="tab-status" id="ts-export">○</span> 5. Export</div>
           <div style="margin-left:auto;padding:0 8px;display:flex;align-items:center;">
             <button class="btn-secondary" onclick="back_to_chapters()" style="font-size:10px;padding:6px 12px;">← All Chapters</button>
           </div>
@@ -439,45 +439,32 @@
           </div>
         </div>
 
-        <!-- STEP: FACT-CHECK -->
-        <div class="step-view" id="step-factcheck">
-          <div class="step-header"><h3>Step 3 — Fact-Check</h3><p>AI checks every factual claim. Review the verdicts, add your notes, then approve the revised draft below.</p></div>
-          <div class="author-notes"><label>Author's Notes — your input for this step</label><textarea id="fc-author-notes" placeholder="Flag facts you know are correct. Point out claims the AI might miss or misread. Add context the checker needs."></textarea><div class="note-hint">Your notes are included when generating the corrected draft. Add them before or after running fact-check, then click Apply Corrections.</div></div>
-          <div class="three-panel">
-            <div class="panel"><div class="panel-header"><span>Original Draft</span></div><div class="panel-body" id="fc-original"><div class="empty-state">Original draft will appear here</div></div></div>
-            <div class="panel"><div class="panel-header"><span>Fact Verdicts</span><span id="grok-fc-status"></span></div><div class="panel-body" id="fc-verdicts"><div class="empty-state">Run fact-check to see verdicts</div></div></div>
-            <div class="decision-bar"><span class="decision-label">Review verdicts, add your notes, then apply corrections.</span><button class="btn-run" id="btn-run-fc" onclick="run_factcheck()">Run Fact-Check</button><button class="btn-run" id="btn-apply-fc" style="display:none;margin-left:8px;background:var(--accent2);" onclick="apply_factcheck()">Apply Corrections</button><button class="btn-approve" id="btn-approve-fc" style="display:none" onclick="approve_factcheck()">Approve & Continue →</button></div>
+        <!-- STEP: REVIEW — All three AIs in parallel -->
+        <div class="step-view" id="step-review">
+          <div class="step-header"><h3>Step 3 — Review</h3><p>Your draft is sent to three AI reviewers in parallel: fact-checking, source verification, and editorial. Read all feedback before proceeding to the editorial step.</p></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0;flex:1;overflow:hidden;">
+            <div class="panel"><div class="panel-header"><span>Fact-Check</span><span id="rv-fc-status"></span></div><div class="panel-body" id="rv-fc-result"><div class="empty-state">Run review to see fact-check results</div></div></div>
+            <div class="panel"><div class="panel-header"><span>Source Verification</span><span id="rv-sc-status"></span></div><div class="panel-body" id="rv-sc-result"><div class="empty-state">Run review to see source results</div></div></div>
+            <div class="panel"><div class="panel-header"><span>Editorial Notes</span><span id="rv-ed-status"></span></div><div class="panel-body" id="rv-ed-result"><div class="empty-state">Run review to see editorial notes</div></div></div>
           </div>
-          <div class="result-panel" id="fc-result-panel"><div class="panel-header"><span>✓ Revised Draft — edit before approving</span></div><div class="panel-body"><textarea id="fc-result-text" style="width:100%;height:100%;min-height:200px;background:transparent;border:none;color:var(--text);font-family:var(--font-body);font-size:14px;line-height:1.8;resize:none;outline:none;"></textarea></div></div>
+          <div class="decision-bar" style="grid-column:1/-1;"><span class="decision-label">All three reviews run in parallel. Read the feedback, then proceed to the editorial step.</span><button class="btn-run" id="btn-run-review" onclick="run_review()">Run All Reviews</button><button class="btn-approve" id="btn-approve-review" style="display:none" onclick="approve_review()">Proceed to Editorial →</button></div>
         </div>
 
-        <!-- STEP: SOURCE CHECK -->
-        <div class="step-view" id="step-sourcecheck">
-          <div class="step-header"><h3>Step 4 — Source Check</h3><p>AI verifies every citation. Review the verdicts, add your notes, then approve the revised draft below.</p></div>
-          <div class="author-notes"><label>Author's Notes — your input for this step</label><textarea id="sc-author-notes" placeholder="Confirm sources you trust. Flag citations that need replacing. Add sources the checker may not know."></textarea><div class="note-hint">Your notes are included when generating the revised draft. Add them before or after running source check, then click Apply Source Fixes.</div></div>
-          <div class="three-panel">
-            <div class="panel"><div class="panel-header"><span>Draft with Sources</span></div><div class="panel-body" id="sc-original"><div class="empty-state">Draft will appear here</div></div></div>
-            <div class="panel"><div class="panel-header"><span>Source Verdicts</span><span id="perp-sc-status"></span></div><div class="panel-body" id="sc-verdicts"><div class="empty-state">Run source check to see verdicts</div></div></div>
-            <div class="decision-bar"><span class="decision-label">Review source verdicts, add your notes, then apply fixes.</span><button class="btn-run" id="btn-run-sc" onclick="run_sourcecheck()">Run Source Check</button><button class="btn-run" id="btn-apply-sc" style="display:none;margin-left:8px;background:var(--accent2);" onclick="apply_sourcecheck_fixes()">Apply Source Fixes</button><button class="btn-approve" id="btn-approve-sc" style="display:none" onclick="approve_sourcecheck()">Approve & Continue →</button></div>
-          </div>
-          <div class="result-panel" id="sc-result-panel"><div class="panel-header"><span>✓ Revised Draft — edit before approving</span></div><div class="panel-body"><textarea id="sc-result-text" style="width:100%;height:100%;min-height:200px;background:transparent;border:none;color:var(--text);font-family:var(--font-body);font-size:14px;line-height:1.8;resize:none;outline:none;"></textarea></div></div>
-        </div>
-
-        <!-- STEP: EDITORIAL -->
+        <!-- STEP: EDITORIAL — Claude synthesizes all feedback -->
         <div class="step-view" id="step-editorial">
-          <div class="step-header"><h3>Step 5 — Editorial Review</h3><p>AI reads the full chapter as a fresh editor. Review the notes, add your own, then approve the final revised draft.</p></div>
-          <div class="author-notes"><label>Author's Notes — your input for this step</label><textarea id="ed-author-notes" placeholder="Tell the editor what matters to you: voice, structure, what to keep, what to change. Your notes shape the final draft."></textarea><div class="note-hint">Your notes are included when generating the revised draft. Add them before or after running editorial, then click Apply Editorial.</div></div>
+          <div class="step-header"><h3>Step 4 — Editorial</h3><p>Claude evaluates all three reviews against your editorial standards. Each recommendation is accepted, declined, or deferred. You see the decision log + revised chapter. Edit before approving.</p></div>
+          <div class="author-notes"><label>Author's Notes — your editorial instructions</label><textarea id="ed-author-notes" placeholder="Tell the editor what matters: what to protect, what to push back on, facts you know are correct, voice you want preserved. Your instructions take priority over all AI recommendations."></textarea><div class="note-hint">Your notes are sent to the editorial AI alongside all three reviews. The author's word is final.</div></div>
           <div class="three-panel">
-            <div class="panel"><div class="panel-header"><span>Current Draft</span></div><div class="panel-body" id="ed-original"><div class="empty-state">Draft will appear here</div></div></div>
-            <div class="panel"><div class="panel-header"><span>Editorial Notes</span><span id="chatgpt-status"></span></div><div class="panel-body" id="ed-notes"><div class="empty-state">Run editorial review to see notes</div></div></div>
-            <div class="decision-bar"><span class="decision-label">Review editorial notes, add your own, then apply changes.</span><button class="btn-run" id="btn-run-ed" onclick="run_editorial()">Run Editorial</button><button class="btn-run" id="btn-apply-ed" style="display:none;margin-left:8px;background:var(--accent2);" onclick="apply_editorial_fixes()">Apply Editorial</button><button class="btn-approve" id="btn-approve-ed" style="display:none" onclick="approve_editorial()">Approve Final Draft →</button></div>
+            <div class="panel"><div class="panel-header"><span>Decision Log</span><span id="ed-log-status"></span></div><div class="panel-body" id="ed-decision-log"><div class="empty-state">Run editorial to see the decision log</div></div></div>
+            <div class="panel"><div class="panel-header"><span>Revised Chapter</span><span id="ed-draft-status"></span></div><div class="panel-body"><textarea id="ed-result-text" placeholder="The revised chapter will appear here. Edit directly before approving." style="width:100%;height:100%;min-height:400px;background:transparent;border:none;color:var(--text);font-family:var(--font-body);font-size:14px;line-height:1.8;resize:none;outline:none;"></textarea></div></div>
+            <div class="decision-bar"><span class="decision-label">Review the decision log. Edit the revised chapter. Approve when ready for export.</span><button class="btn-run" id="btn-run-editorial" onclick="run_editorial()">Run Editorial</button><button class="btn-approve" id="btn-approve-ed" style="display:none" onclick="approve_editorial()">Approve Final Draft →</button></div>
           </div>
-          <div class="result-panel" id="ed-result-panel"><div class="panel-header"><span>✓ Final Draft — edit before approving</span></div><div class="panel-body"><textarea id="ed-result-text" style="width:100%;height:100%;min-height:200px;background:transparent;border:none;color:var(--text);font-family:var(--font-body);font-size:14px;line-height:1.8;resize:none;outline:none;"></textarea></div></div>
+          <div class="result-panel" id="ed-summary-panel"><div class="panel-header"><span>Change Summary</span></div><div class="panel-body" id="ed-change-summary"><div class="empty-state">Summary will appear after editorial</div></div></div>
         </div>
 
         <!-- STEP: EXPORT -->
         <div class="step-view" id="step-export">
-          <div class="step-header"><h3>Step 6 — Export</h3><p>Your approved chapter as text. Copy or download as .txt file.</p></div>
+          <div class="step-header"><h3>Step 5 — Export</h3><p>Your approved chapter as text. Copy or download as .txt file.</p></div>
           <div style="flex:1;display:flex;flex-direction:column;overflow:hidden;padding:20px 28px;gap:16px;">
             <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
               <button class="btn-run" onclick="export_txt()">⬇ Download .txt</button>
@@ -1101,12 +1088,10 @@ function restore_chapter_state() {
   if (d.perpResult) set_panel('perp-result', d.perpResult);
   if (d.grokResult) set_panel('grok-result', d.grokResult);
   if (d.writeDraft) document.getElementById('write-draft').value = d.writeDraft;
-  if (d.fcResult) document.getElementById('fc-result-text').value = d.fcResult;
-  if (d.scResult) document.getElementById('sc-result-text').value = d.scResult;
   if (d.edResult) document.getElementById('ed-result-text').value = d.edResult;
 
   const done = activeChapter.stepsDone || [];
-  const steps = ['research','write','factcheck','sourcecheck','editorial','export'];
+  const steps = ['research','write','review','editorial','export'];
   steps.forEach((s, i) => {
     const tab = document.querySelector(`.pipeline-tab[data-step="${s}"]`);
     if (!tab) return;
@@ -1130,8 +1115,7 @@ function switch_step(step) {
   tab?.classList.add('active');
   document.getElementById(`step-${step}`)?.classList.add('active');
   if (step === 'write') populate_write_step();
-  if (step === 'factcheck') populate_fc_step();
-  if (step === 'sourcecheck') populate_sc_step();
+  if (step === 'review') populate_review_step();
   if (step === 'editorial') populate_ed_step();
   if (step === 'export') populate_export_step();
 }
@@ -1205,9 +1189,9 @@ async function run_write() {
 
 function approve_write() {
   activeChapter.data.writeDraft = document.getElementById('write-draft').value;
-  activeChapter.step = 'factcheck'; activeChapter.stepsDone.push('write');
+  activeChapter.step = 'review'; activeChapter.stepsDone.push('write');
   document.getElementById('ts-write').textContent = '✓'; document.querySelector('.pipeline-tab[data-step="write"]').classList.add('done');
-  unlock_step('factcheck'); save_chapter(); switch_step('factcheck');
+  unlock_step('review'); save_chapter(); switch_step('review');
 }
 
 function paste_own_draft() {
@@ -1225,123 +1209,139 @@ function paste_own_draft() {
   });
 }
 
-// ── STEP 3: FACT-CHECK ──
-function populate_fc_step() {
+// ── STEP 3: REVIEW — All three AIs in parallel ──
+function populate_review_step() {
+  if (activeChapter.data?.reviewFC) { set_panel('rv-fc-result', activeChapter.data.reviewFC); document.getElementById('rv-fc-status').textContent = '✓'; }
+  if (activeChapter.data?.reviewSC) { set_panel('rv-sc-result', activeChapter.data.reviewSC); document.getElementById('rv-sc-status').textContent = '✓'; }
+  if (activeChapter.data?.reviewED) { set_panel('rv-ed-result', activeChapter.data.reviewED); document.getElementById('rv-ed-status').textContent = '✓'; }
+  if (activeChapter.data?.reviewFC && activeChapter.data?.reviewSC && activeChapter.data?.reviewED) {
+    document.getElementById('btn-approve-review').style.display = 'inline-flex';
+  }
+}
+
+async function run_review() {
+  document.getElementById('btn-run-review').disabled = true;
   const draft = activeChapter.data?.writeDraft || '';
-  document.getElementById('fc-original').innerHTML = draft ? `<div class="prose">${esc(draft)}</div>` : '<div class="empty-state">No draft found</div>';
-  if (activeChapter.data?.fcAuthorNotes) document.getElementById('fc-author-notes').value = activeChapter.data.fcAuthorNotes;
-  if (activeChapter.data?.fcVerdicts) { set_panel('fc-verdicts', activeChapter.data.fcVerdicts); document.getElementById('btn-apply-fc').style.display = 'inline-flex'; }
-  if (activeChapter.data?.fcResult) { document.getElementById('fc-result-text').value = activeChapter.data.fcResult; document.getElementById('fc-result-panel').classList.add('visible'); document.getElementById('btn-approve-fc').style.display = 'inline-flex'; }
+  const genre = activeProject.genre;
+  const prompts = STEP_PROMPTS;
+
+  // Run all three in parallel
+  const [fcRes, scRes, edRes] = await Promise.all([
+    ai('grok', prompts.factcheck(genre, draft).grok, null, 'rv-fc-status'),
+    ai('perplexity', prompts.sourcecheck(genre, draft).perplexity, null, 'rv-sc-status'),
+    ai('chatgpt', prompts.editorial(genre, draft).chatgpt, null, 'rv-ed-status')
+  ]);
+
+  const fcText = fcRes.error ? `Error: ${fcRes.error}` : fcRes.text;
+  const scText = scRes.error ? `Error: ${scRes.error}` : scRes.text;
+  const edText = edRes.error ? `Error: ${edRes.error}` : edRes.text;
+
+  set_panel('rv-fc-result', fcText); document.getElementById('rv-fc-status').textContent = fcRes.error ? '✗' : '✓';
+  set_panel('rv-sc-result', scText); document.getElementById('rv-sc-status').textContent = scRes.error ? '✗' : '✓';
+  set_panel('rv-ed-result', edText); document.getElementById('rv-ed-status').textContent = edRes.error ? '✗' : '✓';
+
+  activeChapter.data.reviewFC = fcText;
+  activeChapter.data.reviewSC = scText;
+  activeChapter.data.reviewED = edText;
+  save_chapter();
+
+  document.getElementById('btn-approve-review').style.display = 'inline-flex';
+  document.getElementById('btn-run-review').disabled = false;
 }
 
-async function run_factcheck() {
-  document.getElementById('btn-run-fc').disabled = true;
-  const draft = activeChapter.data?.writeDraft || '';
-  const prompts = STEP_PROMPTS.factcheck(activeProject.genre, draft);
-  const result = await ai('grok', prompts.grok, null, 'grok-fc-status');
-  const text = result.error ? `Error: ${result.error}` : result.text;
-  set_panel('fc-verdicts', text); document.getElementById('grok-fc-status').textContent = result.error ? '✗' : '✓';
-  activeChapter.data.fcVerdicts = text; save_chapter();
-  document.getElementById('btn-apply-fc').style.display = 'inline-flex';
-  document.getElementById('btn-run-fc').disabled = false;
-}
-
-async function apply_factcheck() {
-  document.getElementById('btn-apply-fc').disabled = true;
-  const draft = activeChapter.data?.writeDraft || '';
-  const verdicts = activeChapter.data?.fcVerdicts || '';
-  const authorNotes = document.getElementById('fc-author-notes').value.trim();
-  let applyPrompt = `You are an editor. Here is the original draft:\n\n${draft}\n\n---\n\nHere are the fact-check verdicts:\n\n${verdicts}\n\n---\n\nApply only the ⚠️ Disputed and ❌ Not found corrections. Keep the author's voice intact. Do not add commentary or notes — return only the corrected draft.`;
-  if (authorNotes) applyPrompt += `\n\n---\n\nAUTHOR'S NOTES (the author's instructions take priority over AI verdicts):\n${authorNotes}`;
-  const applyResult = await ai('claude', applyPrompt, null, 'claude-status');
-  const corrected = applyResult.error ? draft : applyResult.text;
-  document.getElementById('fc-result-text').value = corrected; document.getElementById('fc-result-panel').classList.add('visible');
-  activeChapter.data.fcResult = corrected; activeChapter.data.fcAuthorNotes = authorNotes; save_chapter();
-  document.getElementById('btn-approve-fc').style.display = 'inline-flex'; document.getElementById('btn-apply-fc').disabled = false;
-}
-
-function approve_factcheck() {
-  activeChapter.data.fcResult = document.getElementById('fc-result-text').value;
-  activeChapter.step = 'sourcecheck'; activeChapter.stepsDone.push('factcheck');
-  document.getElementById('ts-factcheck').textContent = '✓'; document.querySelector('.pipeline-tab[data-step="factcheck"]').classList.add('done');
-  unlock_step('sourcecheck'); save_chapter(); switch_step('sourcecheck');
-}
-
-// ── STEP 4: SOURCE CHECK ──
-function populate_sc_step() {
-  const draft = activeChapter.data?.fcResult || activeChapter.data?.writeDraft || '';
-  document.getElementById('sc-original').innerHTML = draft ? `<div class="prose">${esc(draft)}</div>` : '<div class="empty-state">No draft found</div>';
-  if (activeChapter.data?.scAuthorNotes) document.getElementById('sc-author-notes').value = activeChapter.data.scAuthorNotes;
-  if (activeChapter.data?.scVerdicts) { set_panel('sc-verdicts', activeChapter.data.scVerdicts); document.getElementById('btn-apply-sc').style.display = 'inline-flex'; }
-  if (activeChapter.data?.scResult) { document.getElementById('sc-result-text').value = activeChapter.data.scResult; document.getElementById('sc-result-panel').classList.add('visible'); document.getElementById('btn-approve-sc').style.display = 'inline-flex'; }
-}
-
-async function run_sourcecheck() {
-  document.getElementById('btn-run-sc').disabled = true;
-  const draft = activeChapter.data?.fcResult || activeChapter.data?.writeDraft || '';
-  const prompts = STEP_PROMPTS.sourcecheck(activeProject.genre, draft);
-  const result = await ai('perplexity', prompts.perplexity, null, 'perp-sc-status');
-  const text = result.error ? `Error: ${result.error}` : result.text;
-  set_panel('sc-verdicts', text); document.getElementById('perp-sc-status').textContent = result.error ? '✗' : '✓';
-  activeChapter.data.scVerdicts = text; save_chapter();
-  document.getElementById('btn-apply-sc').style.display = 'inline-flex';
-  document.getElementById('btn-run-sc').disabled = false;
-}
-
-async function apply_sourcecheck_fixes() {
-  document.getElementById('btn-apply-sc').disabled = true;
-  const draft = activeChapter.data?.fcResult || activeChapter.data?.writeDraft || '';
-  const verdicts = activeChapter.data?.scVerdicts || '';
-  const authorNotes = document.getElementById('sc-author-notes').value.trim();
-  let applyPrompt = `You are an editor. Here is the current draft:\n\n${draft}\n\n---\n\nHere are the source verification verdicts:\n\n${verdicts}\n\n---\n\nFix or replace any sources marked ⚠️ or ❌. Remove unverifiable citations. Keep the author's voice intact. Do not add commentary or notes — return only the revised draft with corrected sources.`;
-  if (authorNotes) applyPrompt += `\n\n---\n\nAUTHOR'S NOTES (the author's instructions take priority over AI verdicts):\n${authorNotes}`;
-  const applyResult = await ai('claude', applyPrompt, null, null);
-  const revised = applyResult.error ? draft : applyResult.text;
-  document.getElementById('sc-result-text').value = revised; document.getElementById('sc-result-panel').classList.add('visible');
-  activeChapter.data.scResult = revised; activeChapter.data.scAuthorNotes = authorNotes; save_chapter();
-  document.getElementById('btn-approve-sc').style.display = 'inline-flex'; document.getElementById('btn-apply-sc').disabled = false;
-}
-
-function approve_sourcecheck() {
-  activeChapter.data.scResult = document.getElementById('sc-result-text').value;
-  activeChapter.step = 'editorial'; activeChapter.stepsDone.push('sourcecheck');
-  document.getElementById('ts-sourcecheck').textContent = '✓'; document.querySelector('.pipeline-tab[data-step="sourcecheck"]').classList.add('done');
+function approve_review() {
+  activeChapter.step = 'editorial'; activeChapter.stepsDone.push('review');
+  document.getElementById('ts-review').textContent = '✓'; document.querySelector('.pipeline-tab[data-step="review"]').classList.add('done');
   unlock_step('editorial'); save_chapter(); switch_step('editorial');
 }
 
-// ── STEP 5: EDITORIAL ──
+// ── STEP 4: EDITORIAL — Claude synthesizes all feedback ──
+const EDITORIAL_SYSTEM_PROMPT = `You are the editorial AI for a publishing project. You receive a chapter plus feedback from three independent AI reviewers (fact-checker, source verifier, editorial reviewer).
+
+Your job is to evaluate EVERY recommendation from all three reviewers and produce a structured response with three parts.
+
+EDITORIAL FRAMEWORK — apply to every recommendation:
+
+ACCEPT if: the recommendation adds verified depth, fits the voice, belongs in this chapter, is verifiable, does not duplicate existing material.
+
+DECLINE if: it introduces opinion where facts belong, changes the author's voice, cannot be verified, duplicates existing material, belongs in a different chapter, alters the author's personal biographical material.
+
+DEFER if: it is valid but belongs in a later chapter, requires additional sourcing, is better as a footnote.
+
+CONFLICTING RECOMMENDATIONS: When reviewers disagree, prefer the better-sourced claim. Prefer primary sources (Reuters, AP, UN, ACLED) over secondary synthesis. If unresolvable, accept the more conservative claim and note the dispute. Never present contested figures as settled fact — use attribution.
+
+IMPORTANT: Do not identify yourself by name or mention which AI model you are. Do not mention the names of the reviewing AIs. Write as a neutral senior editor.
+
+OUTPUT FORMAT — produce exactly three sections separated by the markers shown:
+
+===DECISION LOG===
+List every recommendation from all three reviews. For each:
+- Reviewer: Fact-Check / Source Verification / Editorial
+- Recommendation (one sentence)
+- Decision: ACCEPT / DECLINE / DEFER
+- Reason (one sentence)
+
+===REVISED CHAPTER===
+The complete revised chapter incorporating all ACCEPTED changes. Full text — do not summarise. Preserve the author's voice exactly.
+
+===CHANGE SUMMARY===
+3-8 bullet points: what changed, what was declined, what was deferred. This is the editorial record.`;
+
 function populate_ed_step() {
-  const draft = activeChapter.data?.scResult || activeChapter.data?.fcResult || '';
-  document.getElementById('ed-original').innerHTML = draft ? `<div class="prose">${esc(draft)}</div>` : '<div class="empty-state">No draft found</div>';
   if (activeChapter.data?.edAuthorNotes) document.getElementById('ed-author-notes').value = activeChapter.data.edAuthorNotes;
-  if (activeChapter.data?.editorialNotes) { set_panel('ed-notes', activeChapter.data.editorialNotes); document.getElementById('btn-apply-ed').style.display = 'inline-flex'; }
-  if (activeChapter.data?.edResult) { document.getElementById('ed-result-text').value = activeChapter.data.edResult; document.getElementById('ed-result-panel').classList.add('visible'); document.getElementById('btn-approve-ed').style.display = 'inline-flex'; }
+  if (activeChapter.data?.edDecisionLog) { set_panel('ed-decision-log', activeChapter.data.edDecisionLog); }
+  if (activeChapter.data?.edResult) { document.getElementById('ed-result-text').value = activeChapter.data.edResult; document.getElementById('btn-approve-ed').style.display = 'inline-flex'; }
+  if (activeChapter.data?.edChangeSummary) { set_panel('ed-change-summary', activeChapter.data.edChangeSummary); document.getElementById('ed-summary-panel').classList.add('visible'); }
 }
 
 async function run_editorial() {
-  document.getElementById('btn-run-ed').disabled = true;
-  const draft = activeChapter.data?.scResult || activeChapter.data?.fcResult || '';
-  const prompts = STEP_PROMPTS.editorial(activeProject.genre, draft);
-  const result = await ai('chatgpt', prompts.chatgpt, null, 'chatgpt-status');
-  const text = result.error ? `Error: ${result.error}` : result.text;
-  set_panel('ed-notes', text); document.getElementById('chatgpt-status').textContent = result.error ? '✗' : '✓';
-  activeChapter.data.editorialNotes = text; save_chapter();
-  document.getElementById('btn-apply-ed').style.display = 'inline-flex';
-  document.getElementById('btn-run-ed').disabled = false;
-}
-
-async function apply_editorial_fixes() {
-  document.getElementById('btn-apply-ed').disabled = true;
-  const draft = activeChapter.data?.scResult || activeChapter.data?.fcResult || '';
-  const notes = activeChapter.data?.editorialNotes || '';
+  document.getElementById('btn-run-editorial').disabled = true;
+  const draft = activeChapter.data?.writeDraft || '';
+  const fcFeedback = activeChapter.data?.reviewFC || '';
+  const scFeedback = activeChapter.data?.reviewSC || '';
+  const edFeedback = activeChapter.data?.reviewED || '';
   const authorNotes = document.getElementById('ed-author-notes').value.trim();
-  let applyPrompt = `You are a senior editor. Here is the current draft:\n\n${draft}\n\n---\n\nHere are the editorial notes from review:\n\n${notes}\n\n---\n\nApply the editorial recommendations to the draft. Keep the author's voice intact. Preserve the structure and register. Do not add commentary or notes — return only the final revised draft, publication-ready.`;
-  if (authorNotes) applyPrompt += `\n\n---\n\nAUTHOR'S NOTES (the author's instructions take priority over editorial suggestions):\n${authorNotes}`;
-  const applyResult = await ai('claude', applyPrompt, null, null);
-  const revised = applyResult.error ? draft : applyResult.text;
-  document.getElementById('ed-result-text').value = revised; document.getElementById('ed-result-panel').classList.add('visible');
-  activeChapter.data.edResult = revised; activeChapter.data.edAuthorNotes = authorNotes; save_chapter();
-  document.getElementById('btn-approve-ed').style.display = 'inline-flex'; document.getElementById('btn-apply-ed').disabled = false;
+
+  let prompt = `Here is the chapter:\n\n${draft}\n\n---\n\nFACT-CHECK FEEDBACK:\n${fcFeedback}\n\n---\n\nSOURCE VERIFICATION FEEDBACK:\n${scFeedback}\n\n---\n\nEDITORIAL FEEDBACK:\n${edFeedback}`;
+  if (authorNotes) prompt += `\n\n---\n\nAUTHOR'S NOTES (these instructions take priority over ALL AI recommendations):\n${authorNotes}`;
+  prompt += `\n\n---\n\nRun the editorial process now. Produce all three sections: ===DECISION LOG===, ===REVISED CHAPTER===, ===CHANGE SUMMARY===.`;
+
+  const result = await ai('claude', prompt, EDITORIAL_SYSTEM_PROMPT, 'ed-log-status');
+  if (result.error) {
+    set_panel('ed-decision-log', `Error: ${result.error}`);
+    document.getElementById('btn-run-editorial').disabled = false;
+    return;
+  }
+
+  const text = result.text;
+
+  // Parse the three sections
+  const logMatch = text.match(/===DECISION LOG===([\s\S]*?)(?====REVISED CHAPTER===)/);
+  const chapterMatch = text.match(/===REVISED CHAPTER===([\s\S]*?)(?====CHANGE SUMMARY===)/);
+  const summaryMatch = text.match(/===CHANGE SUMMARY===([\s\S]*?)$/);
+
+  const decisionLog = logMatch ? logMatch[1].trim() : text;
+  const revisedChapter = chapterMatch ? chapterMatch[1].trim() : draft;
+  const changeSummary = summaryMatch ? summaryMatch[1].trim() : '';
+
+  set_panel('ed-decision-log', decisionLog);
+  document.getElementById('ed-result-text').value = revisedChapter;
+  document.getElementById('ed-log-status').textContent = '✓';
+  document.getElementById('ed-draft-status').textContent = '✓';
+
+  if (changeSummary) {
+    set_panel('ed-change-summary', changeSummary);
+    document.getElementById('ed-summary-panel').classList.add('visible');
+  }
+
+  activeChapter.data.edDecisionLog = decisionLog;
+  activeChapter.data.edResult = revisedChapter;
+  activeChapter.data.edChangeSummary = changeSummary;
+  activeChapter.data.edAuthorNotes = authorNotes;
+  save_chapter();
+
+  document.getElementById('btn-approve-ed').style.display = 'inline-flex';
+  document.getElementById('btn-run-editorial').disabled = false;
 }
 
 function approve_editorial() {
@@ -1351,9 +1351,9 @@ function approve_editorial() {
   unlock_step('export'); save_chapter(); switch_step('export');
 }
 
-// ── STEP 6: EXPORT (with WorkSignature + Vault logging) ──
+// ── STEP 5: EXPORT (with WorkSignature + Vault logging) ──
 function populate_export_step() {
-  const final = activeChapter.data?.edResult || activeChapter.data?.scResult || '';
+  const final = activeChapter.data?.edResult || activeChapter.data?.writeDraft || '';
   document.getElementById('export-preview').textContent = final || 'No approved draft found.';
 }
 
