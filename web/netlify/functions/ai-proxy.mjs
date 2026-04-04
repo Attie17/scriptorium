@@ -52,7 +52,7 @@ export default async (req, context) => {
       url = 'https://api.anthropic.com/v1/messages';
       headers = { 'Content-Type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01' };
       body = JSON.stringify({
-        model: 'claude-opus-4-5',
+        model: 'claude-sonnet-4-20250514',
         max_tokens: 4000,
         system: systemPrompt || '',
         messages: [{ role: 'user', content: prompt }]
@@ -90,6 +90,14 @@ export default async (req, context) => {
     }
 
     const res = await fetch(url, { method: 'POST', headers, body });
+
+    // Guard against non-JSON responses (e.g. upstream gateway errors)
+    const contentType = res.headers.get('content-type') || '';
+    if (!contentType.includes('application/json')) {
+      const text = await res.text();
+      return Response.json({ error: `${provider} returned non-JSON (HTTP ${res.status}): ${text.slice(0, 200)}` }, { status: 502 });
+    }
+
     const data = await res.json();
 
     // Normalize response
