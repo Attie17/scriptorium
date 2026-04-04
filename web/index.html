@@ -308,7 +308,13 @@
     <!-- Step 4: Genre -->
     <div class="ob-step" id="ob-step-4">
       <h2>What kind of writing is this?</h2>
-      <div class="sub">This shapes how every AI in the pipeline responds.</div>
+      <div class="sub">Not sure? Describe your project below and I'll suggest the right category.</div>
+      <div id="ob-genre-assist" style="margin-bottom:18px;">
+        <textarea id="ob-genre-desc" placeholder="e.g. I'm writing a weekly account of the Iran conflict for a news website... or: This is my PhD thesis on patristic theology..." style="width:100%;min-height:70px;background:var(--surface2);border:1px solid var(--border);color:var(--text);font-family:var(--font-body);font-size:14px;padding:14px;border-radius:6px;resize:vertical;outline:none;"></textarea>
+        <button class="btn-run" onclick="ob_suggest_genre()" id="btn-suggest-genre" style="margin-top:8px;font-size:11px;padding:8px 18px;">Suggest Category</button>
+        <div id="ob-genre-suggestion" style="display:none;margin-top:10px;padding:12px 16px;background:rgba(124,111,205,0.1);border:1px solid var(--accent2);border-radius:6px;font-size:13px;color:var(--text);line-height:1.6;"></div>
+      </div>
+      <div class="sub" style="margin-bottom:12px;color:var(--text3);font-size:11px;">Or select a category directly:</div>
       <div class="option-grid">
         <button class="option-btn" data-val="history" onclick="ob_select(this,'ob-genre')">📜 History</button>
         <button class="option-btn" data-val="theology" onclick="ob_select(this,'ob-genre')">✝️ Theology</button>
@@ -423,7 +429,7 @@
           <div class="three-panel">
             <div class="panel"><div class="panel-header"><span>Approved Research Brief</span></div><div class="panel-body" id="write-brief-display"><div class="empty-state">Brief will appear here</div></div></div>
             <div class="panel"><div class="panel-header"><span>Draft Chapter</span><span id="claude-status"></span></div><div class="panel-body"><textarea id="write-draft" placeholder="Paste your own text here, or click Generate Draft to have AI write it." style="width:100%;height:100%;min-height:400px;background:transparent;border:none;color:var(--text);font-family:var(--font-body);font-size:14px;line-height:1.8;resize:none;outline:none;"></textarea></div></div>
-            <div class="decision-bar"><span class="decision-label">Paste your own chapter or generate one. Edit in the right panel. Approve when ready.</span><button class="btn-run" id="btn-run-write" onclick="run_write()">Generate Draft</button><button class="btn-secondary" id="btn-paste-write" onclick="paste_own_draft()" style="margin-left:8px;">I Have My Own Text</button><button class="btn-approve" id="btn-approve-write" style="display:none" onclick="approve_write()">Approve Draft →</button></div>
+            <div class="decision-bar"><span class="decision-label">Paste your own chapter or generate one. Edit in the right panel. Approve when ready.</span><button class="btn-run" id="btn-run-write" onclick="run_write()">Generate Draft</button><button onclick="paste_own_draft()" id="btn-paste-write" style="margin-left:8px;background:var(--accent2);color:white;font-family:var(--font-mono);font-size:11px;font-weight:500;letter-spacing:2px;text-transform:uppercase;padding:10px 22px;border:none;border-radius:5px;cursor:pointer;">Paste Your Own</button><button class="btn-approve" id="btn-approve-write" style="display:none" onclick="approve_write()">Approve Draft →</button></div>
           </div>
         </div>
 
@@ -876,6 +882,19 @@ function ob_select(btn, key) {
   }
   if (key === 'ob-lang') ob_lang = btn.dataset.val;
   if (key === 'ob-structure') ob_structure = btn.dataset.val;
+}
+
+async function ob_suggest_genre() {
+  const desc = document.getElementById('ob-genre-desc').value.trim();
+  if (!desc) return;
+  const btn = document.getElementById('btn-suggest-genre');
+  const el = document.getElementById('ob-genre-suggestion');
+  btn.disabled = true; btn.textContent = 'Thinking...';
+  el.style.display = 'block'; el.innerHTML = '<div class="ai-thinking"><div class="spinner"></div>Analysing your project...</div>';
+  const result = await aiCall('claude', `The user is setting up a writing project. They describe it as:\n\n"${desc}"\n\nBased on this, recommend ONE of these categories: History, Theology, Fiction, Journalism, Academic/Scholarly, Science & Research, Business & Finance, Arts & Humanities.\n\nAlso suggest a discipline if applicable.\n\nRespond in 2-3 short sentences: state the recommended category, why it fits, and the discipline if relevant. Be direct and confident. Do not list all categories.`, null);
+  btn.disabled = false; btn.textContent = 'Suggest Category';
+  if (result.error) { el.textContent = 'Could not get a suggestion. Please select a category manually.'; return; }
+  el.innerHTML = `<div style="margin-bottom:6px;font-family:var(--font-mono);font-size:10px;color:var(--accent2);letter-spacing:1px;text-transform:uppercase;">Suggestion</div>${esc(result.text)}`;
 }
 
 function show_discipline_dropdown(prefix, genre) {
