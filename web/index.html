@@ -7,6 +7,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#0c0c0e">
 <title>Scriptorium</title>
+<script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.min.js"></script>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,900;1,400&family=IBM+Plex+Mono:wght@400;500&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300&display=swap');
 
@@ -234,6 +235,13 @@
   .status-dot.complete { background: var(--verified); }
 
   .export-preview { flex: 1; padding: 40px; overflow-y: auto; font-family: var(--font-body); font-size: 15px; line-height: 1.9; color: var(--text); background: var(--surface2); border: 1px solid var(--border); border-radius: 6px; margin: 20px 28px; white-space: pre-wrap; -webkit-overflow-scrolling: touch; }
+  .chapter-preview { flex: 1; padding: 40px; overflow-y: auto; font-family: var(--font-body); font-size: 15px; line-height: 1.9; color: var(--text); background: var(--surface2); border: 1px solid var(--border); border-radius: 6px; margin: 20px 28px; white-space: pre-wrap; -webkit-overflow-scrolling: touch; }
+  .review-response { padding: 10px 20px 14px; border-top: 1px solid var(--border); background: var(--surface2); }
+  .review-response label { font-family: var(--font-mono); font-size: 9px; color: var(--accent); letter-spacing: 2px; text-transform: uppercase; display: block; margin-bottom: 6px; }
+  .review-response textarea { width: 100%; min-height: 60px; background: var(--surface); border: 1px solid var(--border); color: var(--text); font-family: var(--font-body); font-size: 13px; padding: 10px 12px; border-radius: 5px; resize: vertical; outline: none; }
+  .q-field { margin-bottom: 16px; }
+  .q-field label { font-family: var(--font-body); font-size: 14px; color: var(--text); display: block; margin-bottom: 6px; }
+  .q-field textarea { width: 100%; min-height: 60px; background: var(--surface); border: 1px solid var(--border); color: var(--text); font-family: var(--font-body); font-size: 14px; padding: 12px 14px; border-radius: 6px; resize: vertical; outline: none; }
   .empty-state { text-align: center; padding: 60px 20px; color: var(--text3); font-size: 13px; font-family: var(--font-mono); letter-spacing: 1px; }
 
   /* ── MOBILE SIDEBAR ── */
@@ -417,29 +425,44 @@
 
         <!-- STEP: YOUR CHAPTER -->
         <div class="step-view active" id="step-chapter">
-          <div class="step-header"><h3>Step 1 — Your Chapter</h3><p>Paste your chapter below. Tell us what your project is about so the reviewers understand the bigger picture.</p></div>
-          <div style="padding:16px 28px;border-bottom:1px solid var(--border);background:var(--surface2);">
-            <label style="font-family:var(--font-mono);font-size:10px;color:var(--accent);letter-spacing:2px;text-transform:uppercase;display:block;margin-bottom:8px;">About This Project</label>
-            <textarea id="project-context" style="width:100%;min-height:70px;background:var(--surface);border:1px solid var(--border);color:var(--text);font-family:var(--font-body);font-size:14px;padding:14px;border-radius:6px;resize:vertical;outline:none;" placeholder="What is this project about? For example: 'A weekly series analysing the Iran-Israel conflict' or 'A fantasy novel set in a dying kingdom'. This carries over to every chapter."></textarea>
-            <div style="font-size:12px;color:var(--text3);margin-top:6px;font-style:italic;">Saved to your project — every chapter's reviewers will see this.</div>
-          </div>
+          <div class="step-header"><h3>Step 1 — Your Chapter</h3><p>Paste your chapter below. Then answer three short questions so the reviewers understand what you're trying to do.</p></div>
           <div style="flex:1;display:flex;flex-direction:column;overflow:hidden;">
-            <div class="panel-header"><span>Your Chapter</span></div>
-            <div class="panel-body" style="flex:1;"><textarea id="chapter-draft" placeholder="Paste your chapter here." style="width:100%;height:100%;min-height:400px;background:transparent;border:none;color:var(--text);font-family:var(--font-body);font-size:14px;line-height:1.8;resize:none;outline:none;"></textarea></div>
+            <div style="display:flex;flex:1;overflow:hidden;">
+              <!-- Left: paste + questions -->
+              <div style="flex:1;display:flex;flex-direction:column;overflow-y:auto;border-right:1px solid var(--border);">
+                <div style="padding:16px 28px;border-bottom:1px solid var(--border);background:var(--surface2);">
+                  <label style="font-family:var(--font-mono);font-size:10px;color:var(--accent);letter-spacing:2px;text-transform:uppercase;display:block;margin-bottom:8px;">About This Project</label>
+                  <textarea id="project-context" style="width:100%;min-height:50px;background:var(--surface);border:1px solid var(--border);color:var(--text);font-family:var(--font-body);font-size:14px;padding:12px;border-radius:6px;resize:vertical;outline:none;" placeholder="What is this project about? This carries over to every chapter."></textarea>
+                  <div style="font-size:11px;color:var(--text3);margin-top:4px;font-style:italic;">Saved to your project.</div>
+                </div>
+                <div class="panel-header"><span>Paste Your Chapter</span></div>
+                <div class="panel-body" style="flex:1;"><textarea id="chapter-draft" placeholder="Paste your chapter here." style="width:100%;height:100%;min-height:300px;background:transparent;border:none;color:var(--text);font-family:var(--font-body);font-size:14px;line-height:1.8;resize:none;outline:none;"></textarea></div>
+                <div style="padding:16px 28px;border-top:1px solid var(--border);background:var(--surface2);">
+                  <div style="font-family:var(--font-mono);font-size:10px;color:var(--accent2);letter-spacing:2px;text-transform:uppercase;margin-bottom:12px;">Three questions before we begin</div>
+                  <div class="q-field"><label>What were you trying to do in this chapter?</label><textarea id="q-intent" placeholder="For example: 'Establish the timeline of the first 72 hours' or 'Introduce the two main characters and the tension between them.'"></textarea></div>
+                  <div class="q-field"><label>What are you uncertain about?</label><textarea id="q-uncertain" placeholder="For example: 'The casualty figures — I'm not sure the most recent ones are correct' or 'Whether the flashback sequence works here.'"></textarea></div>
+                  <div class="q-field"><label>What should the reviewers pay attention to?</label><textarea id="q-focus" placeholder="For example: 'The sourcing in the second half is weaker' or 'I want to know if the pacing holds.'"></textarea></div>
+                </div>
+              </div>
+              <!-- Right: preview -->
+              <div style="flex:1;display:flex;flex-direction:column;overflow:hidden;">
+                <div class="panel-header"><span>Preview</span><button class="btn-secondary" onclick="preview_chapter()" style="font-size:10px;padding:4px 12px;">Refresh Preview</button></div>
+                <div class="chapter-preview" id="chapter-preview" style="flex:1;margin:0;border-radius:0;border:none;border-left:0;">Your chapter will be displayed here so you can read it as a reader would.</div>
+              </div>
+            </div>
           </div>
-          <div class="author-notes"><label>Notes for Reviewers</label><textarea id="chapter-notes" placeholder="Anything the reviewers should know? For example: 'The casualty figures in paragraph 3 are from ACLED data' or 'This continues from where Chapter 1 left off with the ceasefire.'"></textarea><div class="note-hint">Optional — helps the reviewers give better feedback.</div></div>
-          <div class="decision-bar"><span class="decision-label">Paste your chapter above, then send it for review.</span><button class="btn-approve" id="btn-approve-chapter" onclick="approve_chapter()">Send for Review →</button></div>
+          <div class="decision-bar"><span class="decision-label">Paste your chapter, answer the three questions, then send for review.</span><button class="btn-approve" id="btn-approve-chapter" onclick="approve_chapter()">Send for Review →</button></div>
         </div>
 
         <!-- STEP: REVIEW — Three independent readers -->
         <div class="step-view" id="step-review">
-          <div class="step-header"><h3>Step 2 — Review</h3><p>Your chapter is reviewed by three independent readers. Read their feedback, then move to the final edit.</p></div>
+          <div class="step-header"><h3>Step 2 — Review</h3><p>Three independent readers have gone through your chapter. Read their reports below, then write your response to each one. Your responses travel to the final edit — the reviewer does not get the last word. You do.</p></div>
           <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0;flex:1;overflow:hidden;">
-            <div class="panel"><div class="panel-header"><span id="rv-col1-label">Fact-Check</span><span id="rv-fc-status"></span></div><div class="panel-body" id="rv-fc-result"><div class="empty-state">Click "Get Feedback" to start</div></div></div>
-            <div class="panel"><div class="panel-header"><span id="rv-col2-label">Source Verification</span><span id="rv-sc-status"></span></div><div class="panel-body" id="rv-sc-result"><div class="empty-state">Click "Get Feedback" to start</div></div></div>
-            <div class="panel"><div class="panel-header"><span id="rv-col3-label">Editorial Feedback</span><span id="rv-ed-status"></span></div><div class="panel-body" id="rv-ed-result"><div class="empty-state">Click "Get Feedback" to start</div></div></div>
+            <div class="panel"><div class="panel-header"><span id="rv-col1-label">Fact-Check</span><span id="rv-fc-status"></span></div><div class="panel-body" id="rv-fc-result"><div class="empty-state">Click "Get Feedback" to start</div></div><div class="review-response"><label>Your response</label><textarea id="rv-fc-response" placeholder="Agree, disagree, add context, or flag something for the editor."></textarea></div></div>
+            <div class="panel"><div class="panel-header"><span id="rv-col2-label">Source Verification</span><span id="rv-sc-status"></span></div><div class="panel-body" id="rv-sc-result"><div class="empty-state">Click "Get Feedback" to start</div></div><div class="review-response"><label>Your response</label><textarea id="rv-sc-response" placeholder="Agree, disagree, add context, or flag something for the editor."></textarea></div></div>
+            <div class="panel"><div class="panel-header"><span id="rv-col3-label">Editorial Feedback</span><span id="rv-ed-status"></span></div><div class="panel-body" id="rv-ed-result"><div class="empty-state">Click "Get Feedback" to start</div></div><div class="review-response"><label>Your response</label><textarea id="rv-ed-response" placeholder="Agree, disagree, add context, or flag something for the editor."></textarea></div></div>
           </div>
-          <div class="decision-bar" style="grid-column:1/-1;"><span class="decision-label">Read all three reports. When you're ready, move to the final edit.</span><button class="btn-run" id="btn-run-review" onclick="run_review()">Get Feedback</button><button class="btn-approve" id="btn-approve-review" style="display:none" onclick="approve_review()">Next: Final Edit →</button></div>
+          <div class="decision-bar" style="grid-column:1/-1;"><span class="decision-label">Read all three reports and write your responses. When you're ready, move to the final edit.</span><button class="btn-run" id="btn-run-review" onclick="run_review()">Get Feedback</button><button class="btn-approve" id="btn-approve-review" style="display:none" onclick="approve_review()">Next: Final Edit →</button></div>
         </div>
 
         <!-- STEP: FINAL EDIT — All feedback synthesized -->
@@ -456,15 +479,16 @@
 
         <!-- STEP: EXPORT -->
         <div class="step-view" id="step-export">
-          <div class="step-header"><h3>Step 4 — Export</h3><p>Your finished chapter is ready. Download or copy it.</p></div>
+          <div class="step-header"><h3>Step 4 — Download Your Document</h3><p>Your approved chapter, formatted and ready for upload. No further work needed.</p></div>
           <div style="flex:1;display:flex;flex-direction:column;overflow:hidden;padding:20px 28px;gap:16px;">
             <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
-              <button class="btn-run" onclick="export_txt()">⬇ Download .txt</button>
-              <button class="btn-secondary" onclick="copy_export()">📋 Copy to clipboard</button>
-              <div id="export-lang-toggle" style="display:none;"><button class="btn-secondary" onclick="export_afrikaans()">⬇ Translate & Download Afrikaans</button></div>
+              <button class="btn-run" onclick="export_docx()">⬇ Download .docx</button>
+              <button class="btn-secondary" onclick="export_txt()">⬇ Download .txt</button>
+              <button class="btn-secondary" onclick="copy_export()">📋 Copy text</button>
+              <div id="export-lang-toggle" style="display:none;"><button class="btn-secondary" onclick="export_afrikaans_docx()">⬇ Afrikaans .docx</button></div>
               <span id="export-status" style="font-family:var(--font-mono);font-size:11px;color:var(--text3);"></span>
             </div>
-            <div class="export-preview" id="export-preview">Final chapter will appear here for review before export.</div>
+            <div class="export-preview" id="export-preview">Your finished chapter will appear here.</div>
           </div>
         </div>
 
@@ -1084,7 +1108,12 @@ function restore_chapter_state() {
   }
   if (activeProject.projectContext) document.getElementById('project-context').value = activeProject.projectContext;
   if (d.chapterDraft || d.writeDraft) document.getElementById('chapter-draft').value = d.chapterDraft || d.writeDraft;
-  if (d.chapterNotes) document.getElementById('chapter-notes').value = d.chapterNotes;
+  if (d.qIntent) document.getElementById('q-intent').value = d.qIntent;
+  if (d.qUncertain) document.getElementById('q-uncertain').value = d.qUncertain;
+  if (d.qFocus) document.getElementById('q-focus').value = d.qFocus;
+  if (d.rvResponseFC) document.getElementById('rv-fc-response').value = d.rvResponseFC;
+  if (d.rvResponseSC) document.getElementById('rv-sc-response').value = d.rvResponseSC;
+  if (d.rvResponseED) document.getElementById('rv-ed-response').value = d.rvResponseED;
   if (d.edResult) document.getElementById('ed-result-text').value = d.edResult;
 
   const done = activeChapter.stepsDone || [];
@@ -1140,16 +1169,33 @@ function populate_chapter_step() {
   if (activeProject.projectContext) document.getElementById('project-context').value = activeProject.projectContext;
   if (activeChapter.data?.chapterDraft) document.getElementById('chapter-draft').value = activeChapter.data.chapterDraft;
   else if (activeChapter.data?.writeDraft) document.getElementById('chapter-draft').value = activeChapter.data.writeDraft;
-  if (activeChapter.data?.chapterNotes) document.getElementById('chapter-notes').value = activeChapter.data.chapterNotes;
+  if (activeChapter.data?.qIntent) document.getElementById('q-intent').value = activeChapter.data.qIntent;
+  if (activeChapter.data?.qUncertain) document.getElementById('q-uncertain').value = activeChapter.data.qUncertain;
+  if (activeChapter.data?.qFocus) document.getElementById('q-focus').value = activeChapter.data.qFocus;
+  // Auto-preview if there's already a draft
+  if (activeChapter.data?.chapterDraft || activeChapter.data?.writeDraft) preview_chapter();
+}
+
+function preview_chapter() {
+  const text = document.getElementById('chapter-draft').value.trim();
+  const el = document.getElementById('chapter-preview');
+  if (!text) { el.textContent = 'Your chapter will be displayed here so you can read it as a reader would.'; return; }
+  el.textContent = text;
 }
 
 function approve_chapter() {
   const draft = document.getElementById('chapter-draft').value.trim();
   if (!draft) { alert('Please paste your chapter first.'); return; }
+  const qIntent = document.getElementById('q-intent').value.trim();
+  const qUncertain = document.getElementById('q-uncertain').value.trim();
+  const qFocus = document.getElementById('q-focus').value.trim();
+  if (!qIntent) { alert('Please answer at least the first question: What were you trying to do in this chapter?'); return; }
   activeProject.projectContext = document.getElementById('project-context').value.trim();
   activeChapter.data.chapterDraft = draft;
   activeChapter.data.writeDraft = draft; // backward compat
-  activeChapter.data.chapterNotes = document.getElementById('chapter-notes').value.trim();
+  activeChapter.data.qIntent = qIntent;
+  activeChapter.data.qUncertain = qUncertain;
+  activeChapter.data.qFocus = qFocus;
   activeChapter.step = 'review'; activeChapter.stepsDone = activeChapter.stepsDone || []; activeChapter.stepsDone.push('chapter');
   document.getElementById('ts-chapter').textContent = '✓'; document.querySelector('.pipeline-tab[data-step="chapter"]').classList.add('done');
   unlock_step('review'); save_chapter(); switch_step('review');
@@ -1160,9 +1206,10 @@ function get_chapter_context() {
   if (activeProject.projectContext) parts.push('PROJECT: ' + activeProject.projectContext);
   const chapters = activeProject.chapters || [];
   const prev = chapters.filter(c => c.id !== activeChapter.id && (c.stepsDone?.includes('chapter') || c.stepsDone?.includes('write') || c.stepsDone?.includes('research')));
-  if (prev.length) { parts.push('PREVIOUS CHAPTERS:'); prev.forEach(c => { const d = (c.data?.chapterDraft || c.data?.writeDraft || '').slice(0, 500).replace(/\n/g, ' '); parts.push('- "' + c.title + '"' + (d ? ': ' + d + '...' : '')); }); }
-  const notes = activeChapter.data?.chapterNotes;
-  if (notes) parts.push("AUTHOR'S NOTES FOR THIS CHAPTER: " + notes);
+  if (prev.length) { parts.push('PREVIOUS CHAPTERS IN THIS PROJECT:'); prev.forEach(c => { const d = (c.data?.chapterDraft || c.data?.writeDraft || '').slice(0, 500).replace(/\n/g, ' '); parts.push('- "' + c.title + '"' + (d ? ': ' + d + '...' : '')); }); }
+  if (activeChapter.data?.qIntent) parts.push("AUTHOR'S INTENT: " + activeChapter.data.qIntent);
+  if (activeChapter.data?.qUncertain) parts.push("AUTHOR'S UNCERTAINTIES: " + activeChapter.data.qUncertain);
+  if (activeChapter.data?.qFocus) parts.push("AUTHOR'S FOCUS AREAS FOR REVIEW: " + activeChapter.data.qFocus);
   return parts.join('\n\n');
 }
 
@@ -1178,6 +1225,9 @@ function populate_review_step() {
   if (activeChapter.data?.reviewFC && activeChapter.data?.reviewSC && activeChapter.data?.reviewED) {
     document.getElementById('btn-approve-review').style.display = 'inline-flex';
   }
+  if (activeChapter.data?.rvResponseFC) document.getElementById('rv-fc-response').value = activeChapter.data.rvResponseFC;
+  if (activeChapter.data?.rvResponseSC) document.getElementById('rv-sc-response').value = activeChapter.data.rvResponseSC;
+  if (activeChapter.data?.rvResponseED) document.getElementById('rv-ed-response').value = activeChapter.data.rvResponseED;
 }
 
 async function run_review() {
@@ -1212,21 +1262,24 @@ async function run_review() {
 }
 
 function approve_review() {
+  activeChapter.data.rvResponseFC = document.getElementById('rv-fc-response').value.trim();
+  activeChapter.data.rvResponseSC = document.getElementById('rv-sc-response').value.trim();
+  activeChapter.data.rvResponseED = document.getElementById('rv-ed-response').value.trim();
   activeChapter.step = 'editorial'; activeChapter.stepsDone.push('review');
   document.getElementById('ts-review').textContent = '✓'; document.querySelector('.pipeline-tab[data-step="review"]').classList.add('done');
   unlock_step('editorial'); save_chapter(); switch_step('editorial');
 }
 
 // ── STEP 4: EDITORIAL — Claude synthesizes all feedback ──
-const EDITORIAL_SYSTEM_PROMPT = `You are the editorial AI for a publishing project. You receive a chapter plus feedback from three independent AI reviewers (fact-checker, source verifier, editorial reviewer).
+const EDITORIAL_SYSTEM_PROMPT = `You are the editorial AI for a publishing project. You receive a chapter, feedback from three independent AI reviewers, and the author's written responses to each review. The author's responses are part of the record — they carry the same weight as the reviews.
 
-Your job is to evaluate EVERY recommendation from all three reviewers and produce a structured response with three parts.
+Your job is to evaluate EVERY recommendation from all three reviewers, taking the author's responses into account, and produce a structured response with three parts.
 
 EDITORIAL FRAMEWORK — apply to every recommendation:
 
-ACCEPT if: the recommendation adds verified depth, fits the voice, belongs in this chapter, is verifiable, does not duplicate existing material.
+ACCEPT if: the recommendation adds verified depth, fits the voice, belongs in this chapter, is verifiable, does not duplicate existing material, AND the author has not objected.
 
-DECLINE if: it introduces opinion where facts belong, changes the author's voice, cannot be verified, duplicates existing material, belongs in a different chapter, alters the author's personal biographical material.
+DECLINE if: the author has explicitly disagreed, OR it introduces opinion where facts belong, changes the author's voice, cannot be verified, duplicates existing material, belongs in a different chapter, alters the author's personal biographical material.
 
 DEFER if: it is valid but belongs in a later chapter, requires additional sourcing, is better as a footnote.
 
@@ -1266,7 +1319,12 @@ async function run_editorial() {
   const context = get_chapter_context();
   const labels = GENRE_REVIEW_LABELS[activeProject.genre] || ['Fact-Check', 'Source Verification', 'Editorial Feedback'];
 
-  let prompt = `${context ? 'PROJECT CONTEXT:\n' + context + '\n\n---\n\n' : ''}Here is the chapter:\n\n${draft}\n\n---\n\n${labels[0].toUpperCase()} FEEDBACK:\n${fcFeedback}\n\n---\n\n${labels[1].toUpperCase()} FEEDBACK:\n${scFeedback}\n\n---\n\n${labels[2].toUpperCase()} FEEDBACK:\n${edFeedback}`;
+  let prompt = `${context ? 'PROJECT CONTEXT:\n' + context + '\n\n---\n\n' : ''}Here is the chapter:\n\n${draft}\n\n---\n\n${labels[0].toUpperCase()} FEEDBACK:\n${fcFeedback}`;
+  if (activeChapter.data?.rvResponseFC) prompt += `\n\nAUTHOR'S RESPONSE TO ${labels[0].toUpperCase()}:\n${activeChapter.data.rvResponseFC}`;
+  prompt += `\n\n---\n\n${labels[1].toUpperCase()} FEEDBACK:\n${scFeedback}`;
+  if (activeChapter.data?.rvResponseSC) prompt += `\n\nAUTHOR'S RESPONSE TO ${labels[1].toUpperCase()}:\n${activeChapter.data.rvResponseSC}`;
+  prompt += `\n\n---\n\n${labels[2].toUpperCase()} FEEDBACK:\n${edFeedback}`;
+  if (activeChapter.data?.rvResponseED) prompt += `\n\nAUTHOR'S RESPONSE TO ${labels[2].toUpperCase()}:\n${activeChapter.data.rvResponseED}`;
   if (authorNotes) prompt += `\n\n---\n\nAUTHOR'S NOTES (these instructions take priority over ALL AI recommendations):\n${authorNotes}`;
   prompt += `\n\n---\n\nRun the editorial process now. Produce all three sections: ===DECISION LOG===, ===REVISED CHAPTER===, ===CHANGE SUMMARY===.`;
 
@@ -1315,10 +1373,132 @@ function approve_editorial() {
   unlock_step('export'); save_chapter(); switch_step('export');
 }
 
-// ── STEP 5: EXPORT (with WorkSignature + Vault logging) ──
+// ── STEP 4: EXPORT (with WorkSignature + Vault logging + .docx) ──
 function populate_export_step() {
   const final = activeChapter.data?.edResult || activeChapter.data?.chapterDraft || activeChapter.data?.writeDraft || '';
   document.getElementById('export-preview').textContent = final || 'No chapter found.';
+}
+
+function parse_chapter_to_docx_elements(text) {
+  const { Paragraph, TextRun, HeadingLevel, AlignmentType, PageBreak } = docx;
+  const elements = [];
+  const lines = text.split('\n');
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (!trimmed) {
+      elements.push(new Paragraph({ spacing: { after: 120 } }));
+      continue;
+    }
+    // Chapter heading (# or ## at start)
+    if (/^#{1,2}\s/.test(trimmed)) {
+      const headingText = trimmed.replace(/^#{1,2}\s*/, '');
+      elements.push(new Paragraph({
+        heading: HeadingLevel.HEADING_1,
+        alignment: AlignmentType.CENTER,
+        spacing: { before: 480, after: 240 },
+        children: [new TextRun({ text: headingText, font: 'Georgia', size: 32, bold: true })]
+      }));
+      continue;
+    }
+    // Subheading (### at start)
+    if (/^###\s/.test(trimmed)) {
+      const subText = trimmed.replace(/^###\s*/, '');
+      elements.push(new Paragraph({
+        heading: HeadingLevel.HEADING_2,
+        spacing: { before: 360, after: 180 },
+        children: [new TextRun({ text: subText, font: 'Georgia', size: 28, bold: true })]
+      }));
+      continue;
+    }
+    // Sources / references block (italic)
+    if (/^(sources?|references?|bibliography|works cited)/i.test(trimmed)) {
+      elements.push(new Paragraph({
+        spacing: { before: 360, after: 120 },
+        children: [new TextRun({ text: trimmed, font: 'Georgia', size: 24, bold: true, italics: true })]
+      }));
+      continue;
+    }
+    // Normal paragraph
+    elements.push(new Paragraph({
+      spacing: { after: 200, line: 360 },
+      children: [new TextRun({ text: trimmed, font: 'Georgia', size: 24 })]
+    }));
+  }
+  return elements;
+}
+
+async function export_docx() {
+  const { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType, Header, Footer, PageNumber, NumberFormat } = docx;
+  const content = activeChapter.data?.edResult || activeChapter.data?.chapterDraft || '';
+  const title = activeChapter.title;
+  const genre = activeProject.genre;
+  const discipline = activeProject.discipline || '';
+  const author = activeProject.author || config?.author || '';
+
+  document.getElementById('export-status').textContent = 'Building document...';
+
+  const sig = await generateWorkSignature(title, genre, discipline);
+
+  const chapterElements = parse_chapter_to_docx_elements(content);
+
+  const doc = new Document({
+    creator: author,
+    title: title,
+    description: `${activeProject.name} — ${title}`,
+    sections: [{
+      properties: {
+        page: {
+          size: { width: 8640, height: 12960 }, // 6×9 inches in twips
+          margin: { top: 1440, bottom: 1440, left: 1296, right: 1080 } // 1in top/bottom, 0.9in left, 0.75in right
+        }
+      },
+      headers: {
+        default: new Header({
+          children: [new Paragraph({
+            alignment: AlignmentType.CENTER,
+            children: [new TextRun({ text: activeProject.name, font: 'Georgia', size: 18, color: '666666', italics: true })]
+          })]
+        })
+      },
+      footers: {
+        default: new Footer({
+          children: [new Paragraph({
+            alignment: AlignmentType.CENTER,
+            children: [new TextRun({ children: [PageNumber.CURRENT], font: 'Georgia', size: 18, color: '666666' })]
+          })]
+        })
+      },
+      children: [
+        // Chapter title
+        new Paragraph({
+          heading: HeadingLevel.HEADING_1,
+          alignment: AlignmentType.CENTER,
+          spacing: { before: 2400, after: 480 },
+          children: [new TextRun({ text: title, font: 'Georgia', size: 36, bold: true })]
+        }),
+        new Paragraph({ spacing: { after: 480 } }), // spacer
+        ...chapterElements,
+        // Signature block at end
+        new Paragraph({ spacing: { before: 960 } }),
+        new Paragraph({
+          spacing: { after: 60 },
+          children: [new TextRun({ text: '— Scriptorium Work Signature —', font: 'Georgia', size: 16, color: '999999', italics: true })]
+        }),
+        new Paragraph({
+          children: [new TextRun({ text: `Author: ${sig.authorId}  |  Exported: ${sig.exportedAt}  |  Hash: ${sig.signatureHash.slice(0, 16)}`, font: 'Georgia', size: 14, color: '999999' })]
+        })
+      ]
+    }]
+  });
+
+  const blob = await Packer.toBlob(doc);
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = `${title.replace(/[^a-z0-9]/gi, '_')}.docx`;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+  document.getElementById('export-status').textContent = '✓ Downloaded .docx';
+  activeChapter.stepsDone.push('export'); document.getElementById('ts-export').textContent = '✓'; save_chapter();
+  Vault.log({ authorId: sig.authorId, title, genre, disciplines: discipline, exportedAt: sig.exportedAt, signatureHash: sig.signatureHash, format: 'docx' });
 }
 
 async function export_txt() {
@@ -1352,9 +1532,10 @@ async function copy_export() {
   Vault.log({ authorId: sig.authorId, title, genre, disciplines: discipline, exportedAt: sig.exportedAt, signatureHash: sig.signatureHash });
 }
 
-async function export_afrikaans() {
+async function export_afrikaans_docx() {
+  const { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType, Header, Footer, PageNumber } = docx;
   document.getElementById('export-status').textContent = 'Translating to Afrikaans...';
-  const draft = activeChapter.data?.edResult || '';
+  const draft = activeChapter.data?.edResult || activeChapter.data?.chapterDraft || '';
   const prompts = STEP_PROMPTS.afrikaans(draft);
   const result = await ai('claude', prompts.claude, null, null);
   const afText = result.error ? draft : result.text;
@@ -1362,15 +1543,64 @@ async function export_afrikaans() {
   const title = activeChapter.title;
   const genre = activeProject.genre;
   const discipline = activeProject.discipline || '';
+  const author = activeProject.author || config?.author || '';
   const sig = await generateWorkSignature(title + ' (Afrikaans)', genre, discipline);
-  const header = formatSignatureHeader(sig);
-  const blob = new Blob([header + afText], { type: 'text/plain' });
+
+  const chapterElements = parse_chapter_to_docx_elements(afText);
+  const doc = new Document({
+    creator: author,
+    title: title + ' (Afrikaans)',
+    sections: [{
+      properties: {
+        page: {
+          size: { width: 8640, height: 12960 },
+          margin: { top: 1440, bottom: 1440, left: 1296, right: 1080 }
+        }
+      },
+      headers: {
+        default: new Header({
+          children: [new Paragraph({
+            alignment: AlignmentType.CENTER,
+            children: [new TextRun({ text: activeProject.name, font: 'Georgia', size: 18, color: '666666', italics: true })]
+          })]
+        })
+      },
+      footers: {
+        default: new Footer({
+          children: [new Paragraph({
+            alignment: AlignmentType.CENTER,
+            children: [new TextRun({ children: [PageNumber.CURRENT], font: 'Georgia', size: 18, color: '666666' })]
+          })]
+        })
+      },
+      children: [
+        new Paragraph({
+          heading: HeadingLevel.HEADING_1,
+          alignment: AlignmentType.CENTER,
+          spacing: { before: 2400, after: 480 },
+          children: [new TextRun({ text: title, font: 'Georgia', size: 36, bold: true })]
+        }),
+        new Paragraph({ spacing: { after: 480 } }),
+        ...chapterElements,
+        new Paragraph({ spacing: { before: 960 } }),
+        new Paragraph({
+          spacing: { after: 60 },
+          children: [new TextRun({ text: '— Scriptorium Work Signature —', font: 'Georgia', size: 16, color: '999999', italics: true })]
+        }),
+        new Paragraph({
+          children: [new TextRun({ text: `Author: ${sig.authorId}  |  Exported: ${sig.exportedAt}  |  Hash: ${sig.signatureHash.slice(0, 16)}`, font: 'Georgia', size: 14, color: '999999' })]
+        })
+      ]
+    }]
+  });
+
+  const blob = await Packer.toBlob(doc);
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
-  a.href = url; a.download = `${title.replace(/[^a-z0-9]/gi, '_')}_AF.txt`;
+  a.href = url; a.download = `${title.replace(/[^a-z0-9]/gi, '_')}_AF.docx`;
   document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
-  document.getElementById('export-status').textContent = '✓ Afrikaans version downloaded';
-  Vault.log({ authorId: sig.authorId, title: title + ' (Afrikaans)', genre, disciplines: discipline, exportedAt: sig.exportedAt, signatureHash: sig.signatureHash });
+  document.getElementById('export-status').textContent = '✓ Afrikaans .docx downloaded';
+  Vault.log({ authorId: sig.authorId, title: title + ' (Afrikaans)', genre, disciplines: discipline, exportedAt: sig.exportedAt, signatureHash: sig.signatureHash, format: 'docx' });
 }
 
 // ── MODALS ──
